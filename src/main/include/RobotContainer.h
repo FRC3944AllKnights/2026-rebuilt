@@ -7,6 +7,7 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
 #include "subsystems/CommandSwerveDrivetrain.h"
+#include "subsystems/IntakeSubsystem.h"
 #include "Telemetry.h"
 
 class RobotContainer {
@@ -29,6 +30,7 @@ private:
 
 public:
     subsystems::CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
+    subsystems::IntakeSubsystem intake{TunerConstants::CreateIntake()};
 
     RobotContainer();
 

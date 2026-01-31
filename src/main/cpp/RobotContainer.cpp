@@ -38,6 +38,11 @@ void RobotContainer::ConfigureBindings()
         return point.WithModuleDirection(frc::Rotation2d{-joystick.GetLeftY(), -joystick.GetLeftX()});
     }));
 
+    // Intake controls
+
+    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(true); }));
+    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(false); }));
+    
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
     (joystick.Back() && joystick.Y()).WhileTrue(drivetrain.SysIdDynamic(frc2::sysid::Direction::kForward));
