@@ -8,6 +8,8 @@
 #include <frc2/command/button/CommandXboxController.h>
 #include "subsystems/CommandSwerveDrivetrain.h"
 #include "subsystems/IntakeSubsystem.h"
+#include "subsystems/ShooterSubsystem.h"
+#include "subsystems/ClimberSubsystem.h"
 #include "Telemetry.h"
 
 class RobotContainer {
@@ -31,6 +33,8 @@ private:
 public:
     subsystems::CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
     subsystems::IntakeSubsystem intake{TunerConstants::CreateIntake()};
+    subsystems::ShooterSubsystem shooter{TunerConstants::CreateShooter()};
+    subsystems::ClimberSubsystem climber{TunerConstants::CreateClimber()};
 
     RobotContainer();
 

@@ -294,6 +294,17 @@ public:
         return _drivetrain.SamplePoseAt(utils::FPGAToCurrentTime(timestamp));
     }
 
+    // Custom methods
+
+    // Sets swerve modules to X formation to prevent movement
+    void SetX(bool enable);
+
+    // Drive default command - standard drive + SetX when idle
+    void DriveDefaultCommand(units::velocity::meters_per_second_t inputLeftY,
+        units::velocity::meters_per_second_t inputLeftX,
+        units::angular_velocity::radians_per_second_t inputRightX,
+        swerve::requests::FieldCentric drive);
+
 private:
     void StartSimThread();
 };

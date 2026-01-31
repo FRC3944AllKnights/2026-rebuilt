@@ -40,3 +40,30 @@ void CommandSwerveDrivetrain::StartSimThread()
     });
     m_simNotifier->StartPeriodic(kSimLoopPeriod);
 }
+
+// Custom method
+// Sets swerve modules to X formation to prevent movement
+void CommandSwerveDrivetrain::SetX(bool enable) {
+    // enable: true to set X formation, false to disable
+
+    // stub
+    // TODO: Implement
+}
+
+ void CommandSwerveDrivetrain::DriveDefaultCommand(units::velocity::meters_per_second_t inputLeftY,
+        units::velocity::meters_per_second_t inputLeftX,
+        units::angular_velocity::radians_per_second_t inputRightX,
+        swerve::requests::FieldCentric drive) {
+    // If joystick is idle, set X formation
+    // Else: drive normally
+    if (inputLeftY == 0_mps && inputLeftX == 0_mps && inputRightX == 0_rad_per_s) {
+        SetX(true);
+    }
+    else {
+        SetX(false);
+    }
+    drive.WithVelocityX(inputLeftY) // Drive forward with negative Y (forward)
+        .WithVelocityY(inputLeftX) // Drive left with negative X (left)
+        .WithRotationalRate(inputRightX); // Drive counterclockwise with negative X (left)
+}
+    

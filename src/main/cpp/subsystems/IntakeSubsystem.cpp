@@ -10,10 +10,19 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // TODO: Implement
 }
 
-void subsystems::IntakeSubsystem::RunIntake(bool forward) {
+void subsystems::IntakeSubsystem::RunIntake(double speed) {
     // Power intake motors
-    // forward: true if intaking, false if outtaking
+    // speed: [-1.0, 1.0] for reverse to forward
 
     // Stub
     // TODO: Implement
+}
+
+void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
+    // Set intake position
+    // up: true if intake is up, false if down
+
+    // Stub
+    // TODO: Implement
+    // Note: Position control, not speed control
 }

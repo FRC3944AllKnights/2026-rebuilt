@@ -14,16 +14,13 @@
 
 using namespace ctre::phoenix6;
 
-//#include "Constants.h" // Commented out - we do not know if we need a Constants.h in CTRE
-
-//using namespace IntakeConstants; // Commented out - we do not know if we need a Constants.h in CTRE
 namespace subsystems {
-    class IntakeSubsystem : public frc2::SubsystemBase {
+    class ShooterSubsystem : public frc2::SubsystemBase {
     public:
-        IntakeSubsystem();
-        void RunIntake(double speed);
-        void SetIntakePosition(bool up);
+        ShooterSubsystem();
+        void SpinUpShooter(bool spinUp);
+        void SetIndexerSpeed(double speed);
     private:
         
-};
+    };
 } // namespace subsystems
