@@ -294,12 +294,9 @@ public:
         return _drivetrain.SamplePoseAt(utils::FPGAToCurrentTime(timestamp));
     }
 
-    // Custom methods
+    // Custom public members
 
-    // Sets swerve modules to X formation to prevent movement
-    void SetX(bool enable);
-
-    // Drive default command - standard drive + SetX when idle
+    // Drive default command - standard drive + set X-brake when idle
     void DriveDefaultCommand(units::velocity::meters_per_second_t inputLeftY,
         units::velocity::meters_per_second_t inputLeftX,
         units::angular_velocity::radians_per_second_t inputRightX,
@@ -307,6 +304,10 @@ public:
 
 private:
     void StartSimThread();
+
+    // Custom private members
+
+    swerve::requests::SwerveDriveBrake brake{};
 };
 
 }
