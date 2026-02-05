@@ -74,12 +74,12 @@ void RobotContainer::ConfigureBindings()
     )
     .OnFalse(
         frc2::cmd::Sequence(
-            drivetrain.ApplyRequest([this]() -> auto&& {
-                return drive.WithVelocityX(0_mps) // Drive forward with negative Y (forward)
-                    .WithVelocityY(0_mps) // Drive left with negative X (left)
-                    .WithRotationalRate(units::angular_velocity::radians_per_second_t{0}); // Drive counterclockwise with negative X (left)
-            }),
-            frc2::cmd::Run([this] { shooter.SpinUpShooter(false); })
+            // Get vision target data
+            frc2::cmd::Run([this] { vision.setVisionTarget(hubVisionTarget); }),
+            // Set drivetrain angle - TODO: Implement actual alignment logic
+            frc2::cmd::Run([this] { drivetrain.DriveDefaultCommand(0_mps, 0_mps, 0_rad_per_s, drive); }),
+            // Set shooter speed
+            frc2::cmd::Run([this] { shooter.SpinUpShooter(shooter.getTargetShooterRPM(hubVisionTarget.range)); })
         )
     );
 

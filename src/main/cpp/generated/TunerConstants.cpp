@@ -3,6 +3,7 @@
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
+#include "subsystems/VisionSubsystem.h"
 
 subsystems::CommandSwerveDrivetrain TunerConstants::CreateDrivetrain()
 {
@@ -22,4 +23,9 @@ subsystems::ShooterSubsystem TunerConstants::CreateShooter()
 subsystems::ClimberSubsystem TunerConstants::CreateClimber()
 {
     return subsystems::ClimberSubsystem();
+}
+
+subsystems::VisionSubsystem TunerConstants::CreateVision()
+{
+    return subsystems::VisionSubsystem();
 }

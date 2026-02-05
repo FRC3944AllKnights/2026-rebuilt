@@ -10,6 +10,7 @@
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
+#include "subsystems/VisionSubsystem.h"
 #include "Telemetry.h"
 
 class RobotContainer {
@@ -35,6 +36,7 @@ public:
     subsystems::IntakeSubsystem intake{TunerConstants::CreateIntake()};
     subsystems::ShooterSubsystem shooter{TunerConstants::CreateShooter()};
     subsystems::ClimberSubsystem climber{TunerConstants::CreateClimber()};
+    subsystems::VisionSubsystem vision{TunerConstants::CreateVision()};
 
     RobotContainer();
 
@@ -42,4 +44,5 @@ public:
 
 private:
     void ConfigureBindings();
+    subsystems::VisionSubsystem::visionTarget hubVisionTarget;
 };

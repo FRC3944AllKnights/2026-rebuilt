@@ -11,18 +11,21 @@
 #include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include "Constants.h"
 
 using namespace ctre::phoenix6;
 
 namespace subsystems {
-    class ShooterSubsystem : public frc2::SubsystemBase {
+    class VisionSubsystem : public frc2::SubsystemBase {
     public:
-        ShooterSubsystem();
-        void SpinUpShooter(double speed);
-        void SetIndexerSpeed(double speed);
-        double getTargetShooterRPM(double rangeIn);
+        VisionSubsystem();
+        struct visionTarget {
+            double overheadAngle; // radians - robot spin
+            double range; // inches - distance from shooter to hub center
+        };
+        visionTarget getVisionTarget();
+        void setVisionTarget(visionTarget &target);
     private:
         double degreesToRadians(double degrees);
-    };
+        
+};
 } // namespace subsystems
