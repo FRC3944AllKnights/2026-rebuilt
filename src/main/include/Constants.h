@@ -1,5 +1,7 @@
 #pragma once
 
+#include <units/dimensionless.h>
+
 namespace ClimberConstants {
 
 }
@@ -41,6 +43,16 @@ namespace ShooterConstants {
 
     const double baseRange = 136.46; // inches - tower to hub
     const double minimumRange = 96.0 ; // inches - enough to clear front lip of hub at 60 deg shooter
+
+    // PID
+
+    const units::dimensionless_t shooterP = 0.1;
+    const units::dimensionless_t shooterI = 0.0;
+    const units::dimensionless_t shooterD = 0.0;
+
+    const units::dimensionless_t indexerP = 0.1;
+    const units::dimensionless_t indexerI = 0.0;
+    const units::dimensionless_t indexerD = 0.0;
     
 }
 

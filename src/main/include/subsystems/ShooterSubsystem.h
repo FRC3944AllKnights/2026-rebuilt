@@ -15,6 +15,9 @@
 #include "Constants.h"
 
 using namespace ctre::phoenix6::hardware;
+using namespace ctre::phoenix6::configs;
+
+using namespace ctre::phoenix6::controls;
 
 namespace subsystems {
     class ShooterSubsystem : public frc2::SubsystemBase {
@@ -38,6 +41,12 @@ namespace subsystems {
         TalonFXS m_shooterLeftMotor{CANConstants::kShooterLeftMotorId, CANConstants::kCANBusName};
         TalonFXS m_shooterRightMotor{CANConstants::kShooterRightMotorId, CANConstants::kCANBusName};
         TalonFXS m_indexerMotor{CANConstants::kIndexerMotorId, CANConstants::kCANBusName};
+
+        // Members - Configs
+
+        TalonFXSConfiguration m_shooterLeftMotorConfig;
+        TalonFXSConfiguration m_shooterRightMotorConfig;
+        TalonFXSConfiguration m_indexerMotorConfig;
     
     };
 } // namespace subsystems
