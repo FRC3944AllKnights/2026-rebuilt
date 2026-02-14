@@ -1,3 +1,5 @@
+#pragma once
+
 namespace ClimberConstants {
 
 }
@@ -43,6 +45,10 @@ namespace ShooterConstants {
 }
 
 namespace CANConstants {
+
+    // CAN Bus
+
+    const std::string kCANBusName = "rio";
 
     // Robot Core
 
