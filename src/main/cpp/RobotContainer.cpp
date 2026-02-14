@@ -57,7 +57,6 @@ void RobotContainer::ConfigureBindings()
         { shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
         .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }));
 
-    joystick.GetLeftTriggerAxis();
     // Climber controls
 
     joystick.LeftBumper().WhileTrue(frc2::cmd::Run([this] { climber.SetClimberPosition(-1.0); }))
@@ -68,6 +67,7 @@ void RobotContainer::ConfigureBindings()
     // Auto-align controls
 
     // Align with hub (target) and power up shooter to appropriate speed
+    /*
     joystick.POVUp().WhileTrue(
         frc2::cmd::Sequence(
             drivetrain.ApplyRequest([this]() -> auto&& {
@@ -104,6 +104,7 @@ void RobotContainer::ConfigureBindings()
                 .WithRotationalRate(units::angular_velocity::radians_per_second_t{0}); // Drive counterclockwise with negative X (left)
         })
     );
+    */
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

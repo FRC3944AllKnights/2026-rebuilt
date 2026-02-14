@@ -52,19 +52,20 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
     // Determine target RPM
 
     units::revolutions_per_minute_t baseRPM = 2000.0_rpm; // For prototyping only
-    units::revolutions_per_minute_t targetRPM = speed * baseRPM;
+    double gearRatio = 3.0; // Torque multiplier
+    units::revolutions_per_minute_t targetRPM = speed * baseRPM / gearRatio;
     units::turns_per_second_t targetTPS = targetRPM / 60.0; // Convert RPM to TPS (turns per second)
 
     // Apply to motor
 
-    VelocityVoltage m_request = VelocityVoltage{0_tps}.WithSlot(0);
+    VelocityVoltage m_request = VelocityVoltage{targetTPS}.WithSlot(0);
     m_shooterLeftMotor.SetControl(m_request.WithVelocity(targetTPS));
 
     // Output to dashboard for testing
     
-    frc::SmartDashboard::PutNumber("Shooter Target RPM", targetRPM.value());
+    frc::SmartDashboard::PutNumber("Shooter Wheel Target RPM", targetRPM.value());
     double actualRPM = m_shooterLeftMotor.GetVelocity().GetValue().value() * 60.0;
-    frc::SmartDashboard::PutNumber("Shooter Actual RPM", actualRPM);
+    frc::SmartDashboard::PutNumber("Shooter Wheel Actual RPM", actualRPM);
 }
 
 void subsystems::ShooterSubsystem::SetIndexerSpeed(double speed) {
