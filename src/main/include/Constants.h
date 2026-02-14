@@ -41,3 +41,47 @@ namespace ShooterConstants {
     const double minimumRange = 96.0 ; // inches - enough to clear front lip of hub at 60 deg shooter
     
 }
+
+namespace CANConstants {
+
+    // Robot Core
+
+    const int kPDPId = 0;
+    const int kRIOId = 1;
+
+    // Drivetrain Motors
+
+    const int kFrontLeftDriveMotorId = 11;
+    const int kBackLeftDriveMotorId = 12;
+    const int kFrontRightDriveMotorId = 13;
+    const int kBackRightDriveMotorId = 14;
+
+    const int kFrontLeftSteerMotorId = 15;
+    const int kBackLeftSteerMotorId = 16;
+    const int kFrontRightSteerMotorId = 17;
+    const int kBackRightSteerMotorId = 18;
+
+    // Drivetrain Sensors
+
+    const int kPigeonIMUId = 20;
+    const int kFrontLeftEncoderId = 21;
+    const int kBackLeftEncoderId = 22;
+    const int kFrontRightEncoderId = 23;
+    const int kBackRightEncoderId = 24;
+
+    // Intake
+
+    const int kIntakeDeployLeftMotorId = 30;
+    const int kIntakeDeployRightMotorId = 31;
+    const int kIntakeRollerMotorId = 32;
+
+    // Shooter
+
+    const int kShooterLeftMotorId = 40;
+    const int kShooterRightMotorId = 41;
+    const int kIndexerMotorId = 42;
+
+    // Climber
+
+    const int kClimberMotorId = 50;
+}
