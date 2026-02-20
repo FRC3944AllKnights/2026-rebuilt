@@ -53,6 +53,10 @@ namespace ShooterConstants {
     const units::dimensionless_t indexerP = 0.1;
     const units::dimensionless_t indexerI = 0.0;
     const units::dimensionless_t indexerD = 0.0;
+
+    // Mode
+
+    const bool debugPrintsEnabled = true;
     
 }
 

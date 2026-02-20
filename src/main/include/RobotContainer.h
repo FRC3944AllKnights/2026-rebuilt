@@ -12,6 +12,7 @@
 #include "subsystems/ClimberSubsystem.h"
 #include "subsystems/VisionSubsystem.h"
 #include "Telemetry.h"
+#include <iostream>
 
 class RobotContainer {
 private:

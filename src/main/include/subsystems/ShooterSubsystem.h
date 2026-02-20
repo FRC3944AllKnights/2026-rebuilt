@@ -11,6 +11,7 @@
 #include <frc2/command/sysid/SysIdRoutine.h>
 #include <frc2/command/SubsystemBase.h>
 #include "ctre/phoenix6/TalonFXS.hpp"
+#include <iostream>
 
 #include "Constants.h"
 

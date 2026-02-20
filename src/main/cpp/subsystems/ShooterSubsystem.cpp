@@ -13,33 +13,46 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     // Directly controlled motor, requires PID configuration for velocity control
 
     TalonFXSConfiguration shooterLeftMotorConfig{};
+    shooterLeftMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
     shooterLeftMotorConfig.Slot0.WithKP(ShooterConstants::shooterP);
     shooterLeftMotorConfig.Slot0.WithKI(ShooterConstants::shooterI);
     shooterLeftMotorConfig.Slot0.WithKD(ShooterConstants::shooterD);
+    shooterLeftMotorConfig.Slot0.WithKV(0.12); // TODO: Measure. Found value online
     shooterLeftMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
     shooterLeftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_shooterLeftMotor.GetConfigurator().Apply(m_shooterLeftMotorConfig);
+    m_shooterLeftMotor.GetConfigurator().Apply(shooterLeftMotorConfig);
 
     // Right shooter motor
     // Follower motor, copies output of left motor
 
     TalonFXSConfiguration shooterRightMotorConfig{};
+    shooterRightMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
     shooterRightMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
     shooterRightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_shooterRightMotor.GetConfigurator().Apply(shooterRightMotorConfig);
     bool invertRightMotor = true; // Set to true if right motor needs to be inverted to match left motor's direction
-    Follower rightMotorControlMethod(CANConstants::kShooterRightMotorId, invertRightMotor); 
+    Follower rightMotorControlMethod(CANConstants::kShooterLeftMotorId, invertRightMotor);
     m_shooterRightMotor.SetControl(rightMotorControlMethod);
+
+    // Sets follower mode
+    // TODO: Reset to true after code validated on left motor
+    bool followerModeEnabled = false;
+    if (followerModeEnabled) {
+        Follower rightMotorControlMethod(CANConstants::kShooterLeftMotorId, invertRightMotor); 
+        m_shooterRightMotor.SetControl(rightMotorControlMethod);
+    }
 
     // Indexer motor
 
     TalonFXSConfiguration indexerMotorConfig{};
+    indexerMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
     indexerMotorConfig.Slot0.WithKP(ShooterConstants::indexerP);
     indexerMotorConfig.Slot0.WithKI(ShooterConstants::indexerI);
     indexerMotorConfig.Slot0.WithKD(ShooterConstants::indexerD);
     indexerMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
     indexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_indexerMotor.GetConfigurator().Apply(indexerMotorConfig);
+
 }
 
 void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
@@ -51,21 +64,50 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
 
     // Determine target RPM
 
+    std::cout << "In spin up shooter method" << std::endl;
+
     units::revolutions_per_minute_t baseRPM = 2000.0_rpm; // For prototyping only
-    double gearRatio = 3.0; // Torque multiplier
+    double gearRatio = 1.0; // Torque multiplier
     units::revolutions_per_minute_t targetRPM = speed * baseRPM / gearRatio;
-    units::turns_per_second_t targetTPS = targetRPM / 60.0; // Convert RPM to TPS (turns per second)
+    units::turns_per_second_t targetTPS = targetRPM; // Convert RPM to TPS (turns per second)
 
     // Apply to motor
 
-    VelocityVoltage m_request = VelocityVoltage{targetTPS}.WithSlot(0);
-    m_shooterLeftMotor.SetControl(m_request.WithVelocity(targetTPS));
+    if (speed <= 0.01) {
+        m_shooterLeftMotor.SetControl(NeutralOut{});
+    } else {
+        VelocityVoltage m_request{targetTPS};
+        m_shooterLeftMotor.SetControl(m_request.WithVelocity(targetTPS).WithSlot(0));
+    }
+
+    std::cout << "Sets control" << std::endl;
 
     // Output to dashboard for testing
     
     frc::SmartDashboard::PutNumber("Shooter Wheel Target RPM", targetRPM.value());
-    double actualRPM = m_shooterLeftMotor.GetVelocity().GetValue().value() * 60.0;
+    double actualRPM = m_shooterLeftMotor.GetRotorVelocity().GetValue().value() * 60.0;
     frc::SmartDashboard::PutNumber("Shooter Wheel Actual RPM", actualRPM);
+    std::cout << "Shooter Wheel Target RPM: " << targetRPM.value() << std::endl;
+    std::cout << "Shooter Wheel Actual RPM: " << actualRPM << std::endl;
+
+    if (ShooterConstants::debugPrintsEnabled) {
+        frc::SmartDashboard::PutNumber("Speed Commanded [0, 1]", speed);
+        std::cout << "Speed Commanded [0, 1]: " << speed << std::endl;
+
+        double leftSupplyVoltage = m_shooterLeftMotor.GetSupplyVoltage().GetValue().value();
+        double rightSupplyVoltage = m_shooterRightMotor.GetSupplyVoltage().GetValue().value();
+        frc::SmartDashboard::PutNumber("Shooter Left Supply Voltage", leftSupplyVoltage);
+        frc::SmartDashboard::PutNumber("Shooter Right Supply Voltage", rightSupplyVoltage);
+
+        double rightMotorRPM = m_shooterRightMotor.GetRotorVelocity().GetValue().value() * 60.0;
+        double percentDifferenceShooterMotors = 100.0 * (actualRPM - rightMotorRPM) / ((actualRPM + rightMotorRPM) / 2.0);
+        frc::SmartDashboard::PutNumber("Shooter Motors RPM Percent Difference", percentDifferenceShooterMotors);
+
+        double leftMotorPosition = m_shooterLeftMotor.GetRotorPosition().GetValue().value();
+        double rightMotorPosition = m_shooterRightMotor.GetRotorPosition().GetValue().value();
+        double percentDifferenceShooterMotorsTheta = 100.0 * (leftMotorPosition - rightMotorPosition) / ((leftMotorPosition + rightMotorPosition) / 2.0);
+        frc::SmartDashboard::PutNumber("Shooter Motors theta Percent Difference", percentDifferenceShooterMotorsTheta);
+    }
 }
 
 void subsystems::ShooterSubsystem::SetIndexerSpeed(double speed) {
