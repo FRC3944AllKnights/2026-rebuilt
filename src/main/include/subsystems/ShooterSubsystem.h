@@ -6,6 +6,8 @@
 #include <frc/Timer.h>
 #include <frc/DriverStation.h>
 #include <frc/Notifier.h>
+#include <frc/AddressableLED.h>
+#include <frc/LEDPattern.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/sysid/SysIdRoutine.h>
@@ -14,6 +16,7 @@
 #include <iostream>
 
 #include "Constants.h"
+#include "subsystems/LEDStrip.h"
 
 using namespace ctre::phoenix6::hardware;
 using namespace ctre::phoenix6::configs;
@@ -36,18 +39,27 @@ namespace subsystems {
         // Methods
 
         double degreesToRadians(double degrees);
+        void setLEDs(char patternID);
 
-        // Members - Motors
+        // Members - Devices
         
         TalonFXS m_shooterLeftMotor{CANConstants::kShooterLeftMotorId, CANConstants::kCANBusName};
         TalonFXS m_shooterRightMotor{CANConstants::kShooterRightMotorId, CANConstants::kCANBusName};
         TalonFXS m_indexerMotor{CANConstants::kIndexerMotorId, CANConstants::kCANBusName};
+        LEDStrip m_LEDStrip{ShooterConstants::LEDPort, ShooterConstants::kLength};
 
         // Members - Configs
 
         TalonFXSConfiguration m_shooterLeftMotorConfig;
         TalonFXSConfiguration m_shooterRightMotorConfig;
         TalonFXSConfiguration m_indexerMotorConfig;
-    
+
+        /*
+        frc::AddressableLED m_led{1};
+        std::array<frc::AddressableLED::LEDData, ShooterConstants::kLength> m_ledBuffer;
+        frc::LEDPattern patternYellow = frc::LEDPattern::Solid(frc::Color::kYellow);
+        frc::LEDPattern patternBlue = frc::LEDPattern::Solid(frc::Color::kBlue);
+        frc::LEDPattern patternWhite = frc::LEDPattern::Solid(frc::Color::kWhite);
+        */
     };
 } // namespace subsystems

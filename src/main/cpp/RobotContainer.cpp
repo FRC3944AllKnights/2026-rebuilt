@@ -39,20 +39,18 @@ void RobotContainer::ConfigureBindings()
     }));
 
     // Shooter controls
-
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {
         shooter.SpinUpShooter(0.0);
-    }, {&shooter}));
-    
+        }, {&shooter}));
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
+            std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
             shooter.SpinUpShooter(speed);
         }, {&shooter}));
-
+    
     joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this]
         { shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
         .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }));
-    
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

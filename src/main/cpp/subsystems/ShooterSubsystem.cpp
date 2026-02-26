@@ -30,14 +30,10 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     shooterRightMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
     shooterRightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_shooterRightMotor.GetConfigurator().Apply(shooterRightMotorConfig);
-    bool invertRightMotor = true; // Set to true if right motor needs to be inverted to match left motor's direction
-    Follower rightMotorControlMethod(CANConstants::kShooterLeftMotorId, invertRightMotor);
-    m_shooterRightMotor.SetControl(rightMotorControlMethod);
 
-    // Sets follower mode
-    // TODO: Reset to true after code validated on left motor
-    bool followerModeEnabled = false;
+    bool followerModeEnabled = true;
     if (followerModeEnabled) {
+        bool invertRightMotor = true; // Set to true if right motor needs to be inverted to match left motor's direction
         Follower rightMotorControlMethod(CANConstants::kShooterLeftMotorId, invertRightMotor); 
         m_shooterRightMotor.SetControl(rightMotorControlMethod);
     }
@@ -53,6 +49,13 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     indexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_indexerMotor.GetConfigurator().Apply(indexerMotorConfig);
 
+    // LED Strip
+    //m_LEDStrip = LEDStrip(ShooterConstants::LEDPort, ShooterConstants::kLength);
+    /*
+    m_led.SetLength(ShooterConstants::kLength);
+    m_led.SetData(m_ledBuffer);
+    m_led.Start();
+    */
 }
 
 void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
@@ -62,11 +65,13 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
     // TODO: Implement proper RPM determination
     // Currently for prototyping only
 
+
+
     // Determine target RPM
 
     std::cout << "In spin up shooter method" << std::endl;
 
-    units::revolutions_per_minute_t baseRPM = 2000.0_rpm; // For prototyping only
+    units::revolutions_per_minute_t baseRPM = 6200.0_rpm; // For prototyping only
     double gearRatio = 1.0; // Torque multiplier
     units::revolutions_per_minute_t targetRPM = speed * baseRPM / gearRatio;
     units::turns_per_second_t targetTPS = targetRPM; // Convert RPM to TPS (turns per second)
@@ -108,6 +113,16 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
         double percentDifferenceShooterMotorsTheta = 100.0 * (leftMotorPosition - rightMotorPosition) / ((leftMotorPosition + rightMotorPosition) / 2.0);
         frc::SmartDashboard::PutNumber("Shooter Motors theta Percent Difference", percentDifferenceShooterMotorsTheta);
     }
+
+    // Set LED if shooter is commanded
+    /*
+    if (speed > 0.0) {
+        m_LEDStrip.setLEDs('Y'); // Set to yellow when shooter is commanded
+    }
+     else {
+        m_LEDStrip.setLEDs('B'); // Set to blue when shooter is not commanded
+    }
+        */
 }
 
 void subsystems::ShooterSubsystem::SetIndexerSpeed(double speed) {
@@ -154,3 +169,19 @@ double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
 double subsystems::ShooterSubsystem::degreesToRadians(double degrees) {
     return 0.0174532925 * degrees; // deg * pi / 180
 }
+
+/*
+void subsystems::ShooterSubsystem::setLEDs(char patternID) {
+    // Set LEDs to a specific pattern based on input ID
+    // patternID: character representing the desired pattern (e.g., 'Y' for yellow, 'B' for blue)
+    frc::LEDPattern& pattern = patternWhite; // Default pattern
+    if (patternID == 'Y') {
+        pattern = patternYellow;
+    }
+    else if (patternID == 'B') {
+        pattern = patternBlue;
+    }
+    pattern.ApplyTo(m_ledBuffer);
+    m_led.SetData(m_ledBuffer);
+}
+*/

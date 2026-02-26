@@ -43,6 +43,8 @@ namespace ShooterConstants {
 
     const double baseRange = 136.46; // inches - tower to hub
     const double minimumRange = 96.0 ; // inches - enough to clear front lip of hub at 60 deg shooter
+    const int LEDPort = 1;
+    const int kLength = 60; // number of LEDs in the LED strip
 
     // PID
 
