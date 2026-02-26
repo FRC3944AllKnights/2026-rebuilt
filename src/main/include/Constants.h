@@ -1,4 +1,7 @@
 #pragma once
+#include <units/angle.h>
+#include <units/current.h>
+#include <units/angular_jerk.h>
 
 #include <units/dimensionless.h>
 
@@ -12,6 +15,32 @@ namespace DrivetrainConstants {
 
 namespace IntakeConstants {
 
+    // Gear ratio between motor and arm output shaft
+    const double intakeDeployGearRatio = 12.8;
+
+    // --- PID Gains (Slot 0) for deploy position control ---
+    const double intakeDeployP = 0.1;
+    const double intakeDeployI = 0.0;
+    const double intakeDeployD = 0.0;
+
+    // --- Feedforward Gains ---
+    const double intakeDeployS = 0.25;    // Add 0.25 V output to overcome static friction
+    const double intakeDeployV = 0.12;    // A velocity target of 1 rps results in 0.12 V output
+    const double intakeDeployG = 0.1;     // An acceleration of 1 rps/s requires 0.01 V output
+
+    // --- Motion Magic Profile Parameters ---
+    constexpr auto intakeDeployCruiseVelocity = 5_tps;          // 5 (mechanism) rotations per second cruise
+    constexpr auto intakeDeployAcceleration = 10_tr_per_s_sq;   // Take approximately 0.5 seconds to reach max vel
+    
+    // --- Position Targets (in mechanism rotations) ---
+    constexpr auto intakeDeployedPosition = 5.0_tr;   // Arm down / deployed — TODO: measure on real robot
+    constexpr auto intakeRetractedPosition = 0.0_tr;  // Arm up / retracted (home position)
+        // --- Current Limits ---
+    constexpr auto intakeDeploySupplyCurrentLimit = 40.0_A;  // Amps — protects wiring and breakers
+    constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current
+
+    // --- Motor Inversion ---
+    const bool intakeDeployRightInverted = true;
 }
 
 namespace ShooterConstants {
