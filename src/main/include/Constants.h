@@ -31,6 +31,7 @@ namespace IntakeConstants {
     // --- Motion Magic Profile Parameters ---
     constexpr auto intakeDeployCruiseVelocity = 5_tps;          // 5 (mechanism) rotations per second cruise
     constexpr auto intakeDeployAcceleration = 10_tr_per_s_sq;   // Take approximately 0.5 seconds to reach max vel
+    constexpr auto intakeDeployJerk = 100_tr_per_s_cu;          // Take approximately 0.1 seconds to reach max accel
     
     // --- Position Targets (in mechanism rotations) ---
     constexpr auto intakeDeployedPosition = 5.0_tr;   // Arm down / deployed — TODO: measure on real robot
