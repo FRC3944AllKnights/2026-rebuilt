@@ -1,6 +1,7 @@
 #pragma once
 
 #include <units/dimensionless.h>
+#include <string>
 
 namespace ClimberConstants {
 
@@ -12,6 +13,10 @@ namespace DrivetrainConstants {
 
 namespace IntakeConstants {
 
+}
+
+namespace VisionConstants {
+    const std::string kLimelightName = "limelight-forward";
 }
 
 namespace ShooterConstants {
