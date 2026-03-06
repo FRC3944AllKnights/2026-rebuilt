@@ -16,7 +16,7 @@ namespace IntakeConstants {
 }
 
 namespace VisionConstants {
-    const std::string kLimelightName = "limelight-forward";
+    const std::string kLimelightName = "limelight-intake";
 }
 
 namespace ShooterConstants {
