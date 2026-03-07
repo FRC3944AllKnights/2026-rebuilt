@@ -10,6 +10,10 @@
 
 RobotContainer::RobotContainer()
 {
+    // Configure heading PID for snap-to-45 feature
+    facingAngle.HeadingController.SetPID(7, 0, 0);
+    facingAngle.HeadingController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
+
     ConfigureBindings();
 }
 
@@ -54,6 +58,22 @@ void RobotContainer::ConfigureBindings()
     joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this]
         { shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
         .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }));
+
+    // Snap-to-45: Right stick button locks heading to nearest 45° while allowing translation
+    joystick.RightStick().OnTrue(
+        frc2::cmd::RunOnce([this] {
+            double heading = drivetrain.GetState().Pose.Rotation().Degrees().value();
+            m_snapHeading = units::degree_t{std::round(heading / 45.0) * 45.0};
+        })
+    );
+    joystick.RightStick().WhileTrue(
+        drivetrain.ApplyRequest([this]() -> auto&& {
+            return facingAngle
+                .WithVelocityX(-joystick.GetLeftY() * MaxSpeed)
+                .WithVelocityY(-joystick.GetLeftX() * MaxSpeed)
+                .WithTargetDirection(frc::Rotation2d{m_snapHeading});
+        })
+    );
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
