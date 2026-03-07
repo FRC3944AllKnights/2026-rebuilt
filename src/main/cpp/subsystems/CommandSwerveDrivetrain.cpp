@@ -48,11 +48,11 @@ void CommandSwerveDrivetrain::DriveDefaultCommand(units::velocity::meters_per_se
     // If given zero-velocity command, set X-brake formation
     // Else: drive normally
     if (inputLeftY == 0_mps && inputLeftX == 0_mps && inputRightX == 0_rad_per_s) {
-        this->ApplyRequest([this] {return brake;});
+        SetControl(brake);
     }
     else {
-        drive.WithVelocityX(inputLeftY) // Drive forward with negative Y (forward)
+        SetControl(drive.WithVelocityX(inputLeftY) // Drive forward with negative Y (forward)
             .WithVelocityY(inputLeftX) // Drive left with negative X (left)
-            .WithRotationalRate(inputRightX); // Drive counterclockwise with negative X (left)
+            .WithRotationalRate(inputRightX)); // Drive counterclockwise with negative X (left)
     }
 }

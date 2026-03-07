@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 
+#include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
 
@@ -18,11 +19,13 @@ void RobotContainer::ConfigureBindings()
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.SetDefaultCommand(
         // Drivetrain will execute this command periodically
-        drivetrain.ApplyRequest([this]() -> auto&& {
-            return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-                .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-        })
+        // If joystick is idle, set X formation
+        // Else: drive normally
+        frc2::cmd::Run([this] { drivetrain.DriveDefaultCommand(
+            -frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed, // Drive forward with negative Y (forward)
+            -frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed, // Drive left with negative X (left)
+            -frc::ApplyDeadband(joystick.GetRightX(), 0.1) * MaxAngularRate, // Drive counterclockwise with negative X (left)
+            drive);}, {&drivetrain})
     );
 
     // Idle while the robot is disabled. This ensures the configured
