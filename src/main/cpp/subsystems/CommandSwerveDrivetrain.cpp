@@ -44,7 +44,7 @@ void CommandSwerveDrivetrain::StartSimThread()
 void CommandSwerveDrivetrain::DriveDefaultCommand(units::velocity::meters_per_second_t inputLeftY,
         units::velocity::meters_per_second_t inputLeftX,
         units::angular_velocity::radians_per_second_t inputRightX,
-        swerve::requests::FieldCentric drive) {
+        swerve::requests::FieldCentric& drive) {
     // If given zero-velocity command, set X-brake formation
     // Else: drive normally
     if (inputLeftY == 0_mps && inputLeftX == 0_mps && inputRightX == 0_rad_per_s) {

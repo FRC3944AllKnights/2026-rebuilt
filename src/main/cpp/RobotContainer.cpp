@@ -7,13 +7,12 @@
 #include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
+#include <frc2/command/button/Trigger.h>
 
 RobotContainer::RobotContainer()
 {
-    // Configure heading PID for snap-to-45 feature
-    facingAngle.HeadingController.SetPID(7, 0, 0);
+    facingAngle.HeadingController.SetPID(3, 0, 0.1);
     facingAngle.HeadingController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
-
     ConfigureBindings();
 }
 
@@ -64,13 +63,14 @@ void RobotContainer::ConfigureBindings()
         frc2::cmd::RunOnce([this] {
             double heading = drivetrain.GetState().Pose.Rotation().Degrees().value();
             m_snapHeading = units::degree_t{std::round(heading / 45.0) * 45.0};
+            facingAngle.HeadingController.Reset();
         })
     );
     joystick.RightStick().WhileTrue(
         drivetrain.ApplyRequest([this]() -> auto&& {
             return facingAngle
-                .WithVelocityX(-joystick.GetLeftY() * MaxSpeed)
-                .WithVelocityY(-joystick.GetLeftX() * MaxSpeed)
+                .WithVelocityX(-frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
+                .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
                 .WithTargetDirection(frc::Rotation2d{m_snapHeading});
         })
     );
