@@ -3,6 +3,64 @@
 #include <units/dimensionless.h>
 #include <string>
 
+namespace AprilTagConstants {
+    // All 32 AprilTag IDs for the 2026 Rebuilt & Welded field.
+    // Heights and field positions come from frc::AprilTagFieldLayout at runtime.
+    // Convention: odd IDs = centered on face, even IDs = offset.
+
+    // ── Red Hub (central hex structure) ──
+    constexpr int kRedHubNorthCenter   = 5;
+    constexpr int kRedHubNorthOffset   = 8;
+    constexpr int kRedHubSouthCenter   = 11;
+    constexpr int kRedHubSouthOffset   = 2;
+    constexpr int kRedHubWestCenter    = 9;
+    constexpr int kRedHubWestOffset    = 10;
+    constexpr int kRedHubEastCenter    = 3;
+    constexpr int kRedHubEastOffset    = 4;
+
+    // ── Blue Hub ──
+    constexpr int kBlueHubNorthCenter  = 27;
+    constexpr int kBlueHubNorthOffset  = 18;
+    constexpr int kBlueHubSouthCenter  = 21;
+    constexpr int kBlueHubSouthOffset  = 24;
+    constexpr int kBlueHubWestCenter   = 19;
+    constexpr int kBlueHubWestOffset   = 20;
+    constexpr int kBlueHubEastCenter   = 25;
+    constexpr int kBlueHubEastOffset   = 26;
+
+    // ── Red Trench (above/below hub) ──
+    constexpr int kRedTrenchNorthCenter  = 7;
+    constexpr int kRedTrenchNorthOffset  = 6;
+    constexpr int kRedTrenchSouthCenter  = 1;
+    constexpr int kRedTrenchSouthOffset  = 12;
+
+    // ── Blue Trench ──
+    constexpr int kBlueTrenchNorthCenter = 17;
+    constexpr int kBlueTrenchNorthOffset = 28;
+    constexpr int kBlueTrenchSouthCenter = 23;
+    constexpr int kBlueTrenchSouthOffset = 22;
+
+    // ── Red Outpost ──
+    constexpr int kRedOutpostCenter  = 13;
+    constexpr int kRedOutpostOffset  = 14;
+
+    // ── Blue Outpost ──
+    constexpr int kBlueOutpostCenter = 29;
+    constexpr int kBlueOutpostOffset = 30;
+
+    // ── Red Tower ──
+    constexpr int kRedTowerCenter  = 15;
+    constexpr int kRedTowerOffset  = 16;
+
+    // ── Blue Tower ──
+    constexpr int kBlueTowerCenter = 31;
+    constexpr int kBlueTowerOffset = 32;
+
+    // Convenience arrays
+    constexpr int kRedHubTags[]  = { 2, 3, 4, 5, 8, 9, 10, 11 };
+    constexpr int kBlueHubTags[] = { 18, 19, 20, 21, 24, 25, 26, 27 };
+}
+
 namespace ClimberConstants {
 
 }
@@ -34,8 +92,6 @@ namespace ShooterConstants {
     const double hubHeight = 72.0; // inches
     const double hubTagHeight = 44.25; // inches
     const double hubWidthMax = 44.4; // inches (in x direction - parallel to driver view)
-    const int aprilTagIDHubRed = 9; // ID 10 is offset
-    const int aprilTagIDHubBlue = 25; // ID 26 is offset
 
     const double g = 386.2205; // inches per second^2 - gravitational acceleration on Earth surface
 

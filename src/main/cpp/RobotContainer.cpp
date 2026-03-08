@@ -13,6 +13,9 @@ RobotContainer::RobotContainer()
 {
     facingAngle.HeadingController.SetPID(3, 0, 0.1);
     facingAngle.HeadingController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
+    // Wire vision subsystem to drivetrain for MegaTag2 + Kalman filter fusion
+    vision.SetDrivetrain(&drivetrain);
+
     ConfigureBindings();
 }
 
