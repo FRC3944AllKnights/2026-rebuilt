@@ -91,9 +91,7 @@ void subsystems::VisionSubsystem::Periodic() {
 
 subsystems::VisionSubsystem::visionTarget subsystems::VisionSubsystem::getVisionTarget() {
     // Check if the detected tag is any hub tag (center or offset, either alliance)
-    bool isHubTag = false;
-    for (int id : AprilTagConstants::kRedHubTags)  { if (m_tagID == id) { isHubTag = true; break; } }
-    if (!isHubTag) { for (int id : AprilTagConstants::kBlueHubTags) { if (m_tagID == id) { isHubTag = true; break; } } }
+    bool isHubTag = HasValidShooterTarget();
 
     if (m_hasTarget && isHubTag) {
         // If hub AprilTag visible, determine visionTarget using cached tx/ty
@@ -121,6 +119,28 @@ subsystems::VisionSubsystem::visionTarget subsystems::VisionSubsystem::getVision
         double range = ShooterConstants::baseRange - ShooterConstants::shooterOffsetFromRearBumper;
         return visionTarget{angle, range};
     }
+}
+
+bool subsystems::VisionSubsystem::HasValidShooterTarget() const {
+    // Check if the detected tag is any hub tag (center or offset, either alliance)
+    bool isHubTag = false;
+    for (int id : AprilTagConstants::kRedShooterTags)  { 
+        if (m_tagID == id) { 
+            isHubTag = true; 
+            break; 
+        } 
+    }
+
+    if (!isHubTag) { 
+        for (int id : AprilTagConstants::kBlueShooterTags) { 
+            if (m_tagID == id) { 
+                isHubTag = true; 
+                break; 
+            } 
+        } 
+    }
+
+    return m_hasTarget && isHubTag;
 }
 
 void subsystems::VisionSubsystem::setVisionTarget(visionTarget &target) {

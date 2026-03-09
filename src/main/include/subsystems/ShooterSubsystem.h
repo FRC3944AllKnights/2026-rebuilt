@@ -33,6 +33,10 @@ namespace subsystems {
         void SpinUpShooter(double speed);
         void SetIndexerSpeed(double speed);
         double getTargetShooterRPM(double rangeIn);
+        void SetVision(VisionSubsystem* vision) { m_vision = vision; }
+        void SetAdjustableRPM(bool enabled) { m_adjustableRPM = enabled; }
+        void ToggleAdjustableRPM() { m_adjustableRPM = !m_adjustableRPM; }
+        bool IsAdjustableRPMEnabled() const { return m_adjustableRPM; }
 
     private:
 
@@ -53,6 +57,9 @@ namespace subsystems {
         TalonFXSConfiguration m_shooterLeftMotorConfig;
         TalonFXSConfiguration m_shooterRightMotorConfig;
         TalonFXSConfiguration m_indexerMotorConfig;
+
+        VisionSubsystem* m_vision = nullptr;
+        boo m_adjustableRPM = false;
 
         /*
         frc::AddressableLED m_led{1};

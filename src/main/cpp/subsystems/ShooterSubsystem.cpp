@@ -69,12 +69,23 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
 
     // Determine target RPM
 
-    std::cout << "In spin up shooter method" << std::endl;
-
     units::revolutions_per_minute_t baseRPM = 6200.0_rpm; // For prototyping only
     double gearRatio = 1.0; // Torque multiplier
-    units::revolutions_per_minute_t targetRPM = speed * baseRPM / gearRatio;
-    units::turns_per_second_t targetTPS = targetRPM; // Convert RPM to TPS (turns per second)
+    units::revolutions_per_minute_t targetRPM;
+
+    if (m_adjustableRPM && m_vision != nullptr && speed > 0.01) {
+        if (m_vision->HasValidShooterTarget()) {
+            auto target = m_vision->getVisionTarget();
+            double computedRPM = getTargetShooterRPM(target.range);
+            targetRPM = units::revolutions_per_minute_t(computedRPM);
+        } else {
+            targetRPM = baseRPM / gearRatio;
+        }
+    } else {
+        targetRPM = speed * baseRPM / gearRatio;
+    }
+
+    units::turns_per_second_t targetTPS = targetRPM;
 
     // Apply to motor
 
@@ -85,19 +96,14 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
         m_shooterLeftMotor.SetControl(m_request.WithVelocity(targetTPS).WithSlot(0));
     }
 
-    std::cout << "Sets control" << std::endl;
-
     // Output to dashboard for testing
     
     frc::SmartDashboard::PutNumber("Shooter Wheel Target RPM", targetRPM.value());
     double actualRPM = m_shooterLeftMotor.GetRotorVelocity().GetValue().value() * 60.0;
     frc::SmartDashboard::PutNumber("Shooter Wheel Actual RPM", actualRPM);
-    std::cout << "Shooter Wheel Target RPM: " << targetRPM.value() << std::endl;
-    std::cout << "Shooter Wheel Actual RPM: " << actualRPM << std::endl;
 
     if (ShooterConstants::debugPrintsEnabled) {
         frc::SmartDashboard::PutNumber("Speed Commanded [0, 1]", speed);
-        std::cout << "Speed Commanded [0, 1]: " << speed << std::endl;
 
         double leftSupplyVoltage = m_shooterLeftMotor.GetSupplyVoltage().GetValue().value();
         double rightSupplyVoltage = m_shooterRightMotor.GetSupplyVoltage().GetValue().value();

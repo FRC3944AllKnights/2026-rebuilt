@@ -42,6 +42,8 @@ namespace subsystems {
         // Set drivetrain reference for IMU heading and vision fusion
         void SetDrivetrain(CommandSwerveDrivetrain* drivetrain) { m_drivetrain = drivetrain; }
 
+        bool HasValidShooterTarget() const;
+
     private:
         double degreesToRadians(double degrees);
 
@@ -57,6 +59,7 @@ namespace subsystems {
 
         // Cached values updated every cycle in Periodic()
         bool m_hasTarget = false;
+        bool m_hasShooterTarget = false;
         double m_tx = 0.0;
         double m_ty = 0.0;
         double m_ta = 0.0;

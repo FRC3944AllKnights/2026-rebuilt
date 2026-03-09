@@ -48,9 +48,15 @@ void RobotContainer::ConfigureBindings()
     }));
 
     // Shooter controls
+    shooter.SetVision(&vision);
+
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {
         shooter.SpinUpShooter(0.0);
         }, {&shooter}));
+    joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
+        shooter.ToggleAdjustableRPM();
+        frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
+    }))
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
             std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
