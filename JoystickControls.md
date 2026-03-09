@@ -5,6 +5,7 @@
 ### Sticks
 - Left Stick: Drive (Translation)
 - Right Stick: Drive (Rotation)
+- Right Stick (Pressed): Snap to 45 degree
 
 ### Face Buttons
 - A: Spin Intake In
@@ -31,7 +32,7 @@
 - Start: 
 
 ### Notes
-- If sticks are  idle: swerve modules enter X formation
+- If sticks are idle: swerve modules enter X formation
 
 ## Xbox Joystick 2
 

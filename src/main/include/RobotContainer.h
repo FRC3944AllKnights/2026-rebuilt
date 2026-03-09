@@ -13,6 +13,7 @@
 #include "subsystems/VisionSubsystem.h"
 #include "Telemetry.h"
 #include <iostream>
+#include <cmath>
 
 class RobotContainer {
 private:
@@ -25,6 +26,12 @@ private:
         .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
     swerve::requests::SwerveDriveBrake brake{};
     swerve::requests::PointWheelsAt point{};
+
+    /* Snap-to-45 heading lock request */
+    swerve::requests::FieldCentricFacingAngle facingAngle = swerve::requests::FieldCentricFacingAngle{}
+        .WithDeadband(MaxSpeed * 0.1)
+        .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
+    units::degree_t m_snapHeading{0_deg};
 
     /* Note: This must be constructed before the drivetrain, otherwise we need to
      *       define a destructor to un-register the telemetry from the drivetrain */

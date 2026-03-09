@@ -4,11 +4,15 @@
 
 #include "RobotContainer.h"
 
+#include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
+#include <frc2/command/button/Trigger.h>
 
 RobotContainer::RobotContainer()
 {
+    facingAngle.HeadingController.SetPID(3, 0, 0.1);
+    facingAngle.HeadingController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
     ConfigureBindings();
 }
 
@@ -18,11 +22,13 @@ void RobotContainer::ConfigureBindings()
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.SetDefaultCommand(
         // Drivetrain will execute this command periodically
-        drivetrain.ApplyRequest([this]() -> auto&& {
-            return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-                .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-        })
+        // If joystick is idle, set X formation
+        // Else: drive normally
+        frc2::cmd::Run([this] { drivetrain.DriveDefaultCommand(
+            -frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed, // Drive forward with negative Y (forward)
+            -frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed, // Drive left with negative X (left)
+            -frc::ApplyDeadband(joystick.GetRightX(), 0.1) * MaxAngularRate, // Drive counterclockwise with negative X (left)
+            drive);}, {&drivetrain})
     );
 
     // Idle while the robot is disabled. This ensures the configured
@@ -51,6 +57,23 @@ void RobotContainer::ConfigureBindings()
     joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this]
         { shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
         .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }));
+
+    // Snap-to-45: Right stick button locks heading to nearest 45° while allowing translation
+    joystick.RightStick().OnTrue(
+        frc2::cmd::RunOnce([this] {
+            double heading = drivetrain.GetState().Pose.Rotation().Degrees().value();
+            m_snapHeading = units::degree_t{std::round(heading / 45.0) * 45.0};
+            facingAngle.HeadingController.Reset();
+        })
+    );
+    joystick.RightStick().WhileTrue(
+        drivetrain.ApplyRequest([this]() -> auto&& {
+            return facingAngle
+                .WithVelocityX(-frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
+                .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                .WithTargetDirection(frc::Rotation2d{m_snapHeading});
+        })
+    );
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
