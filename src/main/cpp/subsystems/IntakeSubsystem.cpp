@@ -37,6 +37,13 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     externalFeedback.SensorToMechanismRatio = IntakeConstants::intakeDeployGearRatio;
 
+    // --- Software Limits: prevent mechanism from trying to move beyond physical limits ---
+    configs::SoftLimitsConfigs &softLimits = deployConfig.SoftLimits;
+    softLimits.ForwardSoftLimitEnable = true;
+    softLimits.ForwardSoftLimitThreshold = IntakeConstants::intakeDeployedPosition;
+    softLimits.ReverseSoftLimitEnable = true;
+    softLimits.ReverseSoftLimitThreshold = IntakeConstants::intakeRetractedPosition;
+
     // Apply configuration to the left deploy motor (leader)
     m_intakeDeployLeftMotor.GetConfigurator().Apply(deployConfig);
 
