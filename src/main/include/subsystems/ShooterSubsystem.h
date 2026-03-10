@@ -17,6 +17,7 @@
 
 #include "Constants.h"
 #include "subsystems/LEDStrip.h"
+#include "subsystems/VisionSubsystem.h"
 
 using namespace ctre::phoenix6::hardware;
 using namespace ctre::phoenix6::configs;
@@ -60,7 +61,7 @@ namespace subsystems {
         TalonFXSConfiguration m_indexerMotorConfig;
 
         VisionSubsystem* m_vision = nullptr;
-        boo m_adjustableRPM = false;
+        bool m_adjustableRPM = false;
 
         /*
         frc::AddressableLED m_led{1};

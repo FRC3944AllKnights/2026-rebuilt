@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/MathUtil.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
 #include <frc2/command/button/Trigger.h>
@@ -56,7 +57,7 @@ void RobotContainer::ConfigureBindings()
     joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
         shooter.ToggleAdjustableRPM();
         frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
-    }))
+    }));
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
             std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
