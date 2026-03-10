@@ -86,7 +86,7 @@ namespace ShooterConstants {
     const double shooterHeight = 20.0; // inches, measured from ball center at exit
     const double shooterOffsetFromRearBumper = 10.0; // inches
     const double forwardCameraHeight = 18.0; // inches
-    const double forwardCameraAngle = 45.0; // degrees
+    const double forwardCameraAngle = 0.0; // degrees (mounted level)
     const double forwardCameraShooterOffset = 6.0; // inches - distance between camera and ball exit
     
     const double hubHeight = 72.0; // inches

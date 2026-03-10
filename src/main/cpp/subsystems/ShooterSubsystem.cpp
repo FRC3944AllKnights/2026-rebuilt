@@ -180,11 +180,21 @@ double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
         b = std::tan(ShooterConstants::exitAngle * 3.14159 / 180.0);
     }
     double a = (ShooterConstants::hubHeight - ShooterConstants::shooterHeight - b * range) / (range * range);
-    double c = 2.0 * ShooterConstants::shooterHeight;
-    double determinant = b * b - 4.0 * a * c;
-    double range_floor_to_floor = -1.0 * b - std::sqrt(determinant) / (2.0 * a);
-    double exit_speed = std::sqrt(range_floor_to_floor * ShooterConstants::g / std::sin(b));
-    double rpm_nominal = exit_speed / ShooterConstants::shooterCircumference;
+
+    // Extract exit velocity directly from trajectory coefficient a.
+    // a encodes -g / (2 * v² * cos²θ), so solve for v:
+    double cosTheta = std::cos(ShooterConstants::exitAngle * 3.14159 / 180.0);
+    double exit_speed = std::sqrt(-ShooterConstants::g / (2.0 * a * cosTheta * cosTheta));
+    double rpm_nominal = (exit_speed / ShooterConstants::shooterCircumference) * 60.0;
+
+    if (ShooterConstants::debugPrintsEnabled) {
+        frc::SmartDashboard::PutNumber("Shooter/Debug/InputRange", rangeIn);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/ClampedRange", range);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/CoeffA", a);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/ExitSpeedInPerSec", exit_speed);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/RPMNominal", rpm_nominal);
+    }
+
     return rpm_nominal * ShooterConstants::shooterBallSpeedTransferPercent;
 }
 
