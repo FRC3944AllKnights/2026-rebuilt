@@ -1,6 +1,7 @@
 #include "subsystems/IntakeSubsystem.h"
 #include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc/RobotController.h>
+#include <iostream>
 
 using namespace ctre::phoenix6;
 
@@ -8,6 +9,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // === Deploy Motor Configuration ===
     // Create a configuration object
     configs::TalonFXSConfiguration deployConfig{};
+    deployConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
 
     // --- PID Slot 0: closed-loop position control gains ---
     configs::Slot0Configs &slot0 = deployConfig.Slot0;
@@ -38,7 +40,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     externalFeedback.SensorToMechanismRatio = IntakeConstants::intakeDeployGearRatio;
 
     // --- Software Limits: prevent mechanism from trying to move beyond physical limits ---
-    configs::SoftLimitsConfigs &softLimits = deployConfig.SoftLimits;
+    configs::SoftwareLimitSwitchConfigs &softLimits = deployConfig.SoftwareLimitSwitch;
     softLimits.ForwardSoftLimitEnable = true;
     softLimits.ForwardSoftLimitThreshold = IntakeConstants::intakeDeployedPosition;
     softLimits.ReverseSoftLimitEnable = true;
@@ -65,7 +67,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // === Roller Motor Configuration ===
     configs::TalonFXSConfiguration rollerConfig{};
     configs::CurrentLimitsConfigs &rollerLimits = rollerConfig.CurrentLimits;
-
+    rollerConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
     rollerLimits.SupplyCurrentLimitEnable = true;
     rollerLimits.SupplyCurrentLimit = IntakeConstants::intakeRollerSupplyCurrentLimit;
     m_intakeRollerMotor.GetConfigurator().Apply(rollerConfig);
@@ -87,6 +89,7 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     // up: true = retracted (stowed), false = deployed (down to collect game pieces)
     // MotionMagicVoltage tells the motor controller to go to an exact position
     // following the trapezoidal/S-curve profile configured in the constructor
+    std::cout << "In set intake position" << std::endl;
     auto targetPosition = up
         ? IntakeConstants::intakeRetractedPosition
         : IntakeConstants::intakeDeployedPosition;

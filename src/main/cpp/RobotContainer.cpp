@@ -8,6 +8,7 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
 #include <frc2/command/button/Trigger.h>
+#include <iostream>
 
 RobotContainer::RobotContainer()
 {
@@ -39,10 +40,14 @@ void RobotContainer::ConfigureBindings()
         }).IgnoringDisable(true)
     );
 
-    joystick.A().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& { return brake; }));
-    joystick.B().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& {
-        return point.WithModuleDirection(frc::Rotation2d{-joystick.GetLeftY(), -joystick.GetLeftX()});
-    }));
+    // Intake controls
+
+    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }))
+        .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
+    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }))
+        .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
+    joystick.X().OnTrue(frc2::cmd::RunOnce([this] { std::cout << "pressed x" << std::endl; intake.SetIntakePosition(false); }));
+    joystick.Y().OnTrue(frc2::cmd::RunOnce([this] { std::cout << "pressed y" << std::endl; intake.SetIntakePosition(true); }));
 
     // Shooter controls
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {
