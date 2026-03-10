@@ -8,11 +8,14 @@ using namespace ctre::phoenix6;
 subsystems::IntakeSubsystem::IntakeSubsystem() {
     // === Deploy Motor Configuration ===
     // Create a configuration object
-    configs::TalonFXSConfiguration deployConfig{};
-    deployConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    configs::TalonFXSConfiguration deployLeftConfig{};
+
+    // --- Motor Type: NEO_JST --- 
+    configs::CommutationConfigs &commutation = deployLeftConfig.Commutation;
+    commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
 
     // --- PID Slot 0: closed-loop position control gains ---
-    configs::Slot0Configs &slot0 = deployConfig.Slot0;
+    configs::Slot0Configs &slot0 = deployLeftConfig.Slot0;
 
     slot0.kP = IntakeConstants::intakeDeployP;
     slot0.kI = IntakeConstants::intakeDeployI;
@@ -22,41 +25,48 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     slot0.kG = IntakeConstants::intakeDeployG;
 
     // --- Motion Magic: smooth trapezoidal/S-curve motion profile ---
-    configs::MotionMagicConfigs &motionMagic = deployConfig.MotionMagic;
+    configs::MotionMagicConfigs &motionMagic = deployLeftConfig.MotionMagic;
 
     motionMagic.MotionMagicCruiseVelocity = IntakeConstants::intakeDeployCruiseVelocity;
     motionMagic.MotionMagicAcceleration = IntakeConstants::intakeDeployAcceleration;
     motionMagic.MotionMagicJerk = IntakeConstants::intakeDeployJerk; 
 
     // --- Current Limits: protect motors and wiring ---
-    configs::CurrentLimitsConfigs &deployLimits = deployConfig.CurrentLimits;
+    configs::CurrentLimitsConfigs &deployLimits = deployLeftConfig.CurrentLimits;
 
     deployLimits.SupplyCurrentLimitEnable = true;
     deployLimits.SupplyCurrentLimit = IntakeConstants::intakeDeploySupplyCurrentLimit;
 
     // --- Feedback: account for gear reduction between motor and arm ---
-    configs::ExternalFeedbackConfigs &externalFeedback = deployConfig.ExternalFeedback;
+    configs::ExternalFeedbackConfigs &externalFeedback = deployLeftConfig.ExternalFeedback;
 
     externalFeedback.SensorToMechanismRatio = IntakeConstants::intakeDeployGearRatio;
 
     // --- Software Limits: prevent mechanism from trying to move beyond physical limits ---
-    configs::SoftwareLimitSwitchConfigs &softLimits = deployConfig.SoftwareLimitSwitch;
+    configs::SoftwareLimitSwitchConfigs &softLimits = deployLeftConfig.SoftwareLimitSwitch;
     softLimits.ForwardSoftLimitEnable = true;
     softLimits.ForwardSoftLimitThreshold = IntakeConstants::intakeDeployedPosition;
     softLimits.ReverseSoftLimitEnable = true;
     softLimits.ReverseSoftLimitThreshold = IntakeConstants::intakeRetractedPosition;
 
     // Apply configuration to the left deploy motor (leader)
-    m_intakeDeployLeftMotor.GetConfigurator().Apply(deployConfig);
+    m_intakeDeployLeftMotor.GetConfigurator().Apply(deployLeftConfig);
 
-    // Invert the right motor if it's mounted opposite the left
-    configs::MotorOutputConfigs &motorOutput = deployConfig.MotorOutput;
+    configs::TalonFXSConfiguration deployRightConfig{};
 
-    motorOutput.Inverted = IntakeConstants::intakeDeployRightInverted
-        ? signals::InvertedValue::Clockwise_Positive
-        : signals::InvertedValue::CounterClockwise_Positive;
+    // --- Motor Type: NEO_JST --- 
+
+    configs::CommutationConfigs &commutation = deployRightConfig.Commutation;
+    commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+
+    // --- Current Limits: protect motors and wiring ---
+
+    configs::CurrentLimitsConfigs &deployLimits = deployRightConfig.CurrentLimits;
+
+    deployLimits.SupplyCurrentLimitEnable = true;
+    deployLimits.SupplyCurrentLimit = IntakeConstants::intakeDeploySupplyCurrentLimit;
         
-    m_intakeDeployRightMotor.GetConfigurator().Apply(deployConfig);
+    m_intakeDeployRightMotor.GetConfigurator().Apply(deployRightConfig);
 
     // Set the right motor to follow the left motor's output
     // The bool parameter inverts the follower's direction (true = oppose leader)
