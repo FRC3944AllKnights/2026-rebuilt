@@ -58,6 +58,22 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     */
 }
 
+void subsystems::ShooterSubsystem::Periodic() {
+    // Passive debug telemetry — publish computed RPM without requiring trigger input
+    frc::SmartDashboard::PutBoolean("Shooter/AdjustableRPMEnabled", m_adjustableRPM);
+
+    if (m_vision != nullptr) {
+        bool isShootable = m_vision->HasValidShooterTarget();
+        if (m_adjustableRPM && isShootable) {
+            auto target = m_vision->getVisionTarget();
+            double computedRPM = getTargetShooterRPM(target.range);
+            frc::SmartDashboard::PutNumber("Shooter/ComputedRPM", computedRPM);
+        } else {
+            frc::SmartDashboard::PutNumber("Shooter/ComputedRPM", 0.0);
+        }
+    }
+}
+
 void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
     // Set shooter motors to speed
     // speed: speed from 0 to 1.0

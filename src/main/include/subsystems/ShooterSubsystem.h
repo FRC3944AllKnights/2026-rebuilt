@@ -30,6 +30,7 @@ namespace subsystems {
         // Methods
 
         ShooterSubsystem();
+        void Periodic() override;
         void SpinUpShooter(double speed);
         void SetIndexerSpeed(double speed);
         double getTargetShooterRPM(double rangeIn);

@@ -27,6 +27,12 @@ void subsystems::VisionSubsystem::Periodic() {
         double distanceToTag = heightToCover / std::tan(degreesToRadians(angleToCover));
 
         m_range = distanceToTag + ShooterConstants::forwardCameraShooterOffset;
+
+        // Debug: intermediate distance-calc values
+        frc::SmartDashboard::PutNumber("Vision/TagHeight", tagHeight);
+        frc::SmartDashboard::PutNumber("Vision/HeightToCover", heightToCover);
+        frc::SmartDashboard::PutNumber("Vision/AngleToCover", angleToCover);
+        frc::SmartDashboard::PutNumber("Vision/RawDistToTag", distanceToTag);
     } else {
         m_range = 0.0;
     }
@@ -79,6 +85,7 @@ void subsystems::VisionSubsystem::Periodic() {
     frc::SmartDashboard::PutNumber("Vision/TA", m_ta);
     frc::SmartDashboard::PutNumber("Vision/Range", m_range);
     frc::SmartDashboard::PutNumber("Vision/TagID", m_tagID);
+    frc::SmartDashboard::PutBoolean("Vision/IsShootableTag", HasValidShooterTarget());
     frc::SmartDashboard::PutBoolean("Vision/HasValidPose", m_hasValidPose);
     if (m_hasValidPose) {
         frc::SmartDashboard::PutNumber("Vision/PoseX", m_poseEstimate.pose.X().value());
