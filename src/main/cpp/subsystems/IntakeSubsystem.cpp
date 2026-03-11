@@ -106,5 +106,15 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     m_intakeDeployLeftMotor.SetControl(
         controls::MotionMagicVoltage{targetPosition}
     );
-    // Right motor follows automatically via the Follower set in constructor
+    m_intakeDeployRightMotor.SetControl(
+        controls::Follower{m_intakeDeployLeftMotor.GetDeviceID(), IntakeConstants::intakeDeployRightInverted}
+    );
+}
+
+bool subsystems::IntakeSubsystem::IsAtPosition(bool up) {
+    auto targetPosition = up
+        ? IntakeConstants::intakeRetractedPosition
+        : IntakeConstants::intakeDeployedPosition;
+    auto currentPosition = m_intakeDeployLeftMotor.GetPosition().GetValue();
+    return units::math::abs(currentPosition - targetPosition) < IntakeConstants::intakePositionTolerance;
 }

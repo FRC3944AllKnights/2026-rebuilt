@@ -24,6 +24,7 @@ namespace subsystems {
         IntakeSubsystem();
         void RunIntake(double speed);
         void SetIntakePosition(bool up);
+        bool IsAtPosition(bool up);
     private:
 
         // Members - Motors

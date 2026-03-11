@@ -46,8 +46,10 @@ void RobotContainer::ConfigureBindings()
         .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
     joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }))
         .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
-    joystick.X().OnTrue(frc2::cmd::RunOnce([this] { std::cout << "pressed x" << std::endl; intake.SetIntakePosition(false); }));
-    joystick.Y().OnTrue(frc2::cmd::RunOnce([this] { std::cout << "pressed y" << std::endl; intake.SetIntakePosition(true); }));
+    joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake})
+        .Until([this] { return intake.IsAtPosition(false); }));
+    joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake})
+        .Until([this] { return intake.IsAtPosition(true); }));
 
     // Shooter controls
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {

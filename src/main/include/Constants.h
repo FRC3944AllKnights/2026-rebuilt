@@ -41,6 +41,9 @@ namespace IntakeConstants {
     constexpr auto intakeDeploySupplyCurrentLimit = 40.0_A;  // Amps — protects wiring and breakers
     constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current
 
+    // --- Position Tolerance ---
+    constexpr auto intakePositionTolerance = 0.05_tr;
+
     // --- Motor Inversion ---
     const bool intakeDeployRightInverted = true;
 }
