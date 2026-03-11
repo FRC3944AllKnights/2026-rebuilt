@@ -51,7 +51,8 @@ namespace subsystems {
         
         TalonFXS m_shooterLeftMotor{CANConstants::kShooterLeftMotorId, CANConstants::kCANBusName};
         TalonFXS m_shooterRightMotor{CANConstants::kShooterRightMotorId, CANConstants::kCANBusName};
-        TalonFXS m_indexerMotor{CANConstants::kIndexerMotorId, CANConstants::kCANBusName};
+        TalonFXS m_indexerLeftMotor{CANConstants::kIndexerLeftMotorId, CANConstants::kCANBusName};
+        TalonFXS m_indexerRightMotor{CANConstants::kIndexerRightMotorId, CANConstants::kCANBusName};
         LEDStrip m_LEDStrip{ShooterConstants::LEDPort, ShooterConstants::kLength};
 
         // Members - Configs

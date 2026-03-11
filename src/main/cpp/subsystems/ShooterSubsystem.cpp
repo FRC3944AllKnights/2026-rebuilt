@@ -40,14 +40,23 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
 
     // Indexer motor
 
-    TalonFXSConfiguration indexerMotorConfig{};
-    indexerMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
-    indexerMotorConfig.Slot0.WithKP(ShooterConstants::indexerP);
-    indexerMotorConfig.Slot0.WithKI(ShooterConstants::indexerI);
-    indexerMotorConfig.Slot0.WithKD(ShooterConstants::indexerD);
-    indexerMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
-    indexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_indexerMotor.GetConfigurator().Apply(indexerMotorConfig);
+    TalonFXSConfiguration indexerLeftMotorConfig{};
+    indexerLeftMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    indexerLeftMotorConfig.Slot0.WithKP(ShooterConstants::indexerP);
+    indexerLeftMotorConfig.Slot0.WithKI(ShooterConstants::indexerI);
+    indexerLeftMotorConfig.Slot0.WithKD(ShooterConstants::indexerD);
+    indexerLeftMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
+    indexerLeftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_indexerLeftMotor.GetConfigurator().Apply(indexerLeftMotorConfig);
+
+    TalonFXSConfiguration indexerRightMotorConfig{};
+    indexerRightMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    indexerRightMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
+    indexerRightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_indexerRightMotor.GetConfigurator().Apply(indexerRightMotorConfig);   
+
+    Follower rightIndexerMotorControlMethod(CANConstants::kIndexerLeftMotorId, true); 
+    m_indexerRightMotor.SetControl(rightIndexerMotorControlMethod);
 
     // LED Strip
     //m_LEDStrip = LEDStrip(ShooterConstants::LEDPort, ShooterConstants::kLength);

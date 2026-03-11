@@ -164,9 +164,10 @@ namespace CANConstants {
 
     const int kShooterLeftMotorId = 40;
     const int kShooterRightMotorId = 41;
-    const int kIndexerMotorId = 42;
+    const int kIndexerLeftMotorId = 42;
+    const int kIndexerRightMotorId = 50;
 
     // Climber
 
-    const int kClimberMotorId = 50;
+    // const int kClimberMotorId = 50;
 }
