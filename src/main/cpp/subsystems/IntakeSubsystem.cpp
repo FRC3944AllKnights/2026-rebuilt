@@ -56,15 +56,15 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     // --- Motor Type: NEO_JST --- 
 
-    configs::CommutationConfigs &commutation = deployRightConfig.Commutation;
-    commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    configs::CommutationConfigs &rightCommutation = deployRightConfig.Commutation;
+    rightCommutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
 
     // --- Current Limits: protect motors and wiring ---
 
-    configs::CurrentLimitsConfigs &deployLimits = deployRightConfig.CurrentLimits;
+    configs::CurrentLimitsConfigs &rightDeployLimits = deployRightConfig.CurrentLimits;
 
-    deployLimits.SupplyCurrentLimitEnable = true;
-    deployLimits.SupplyCurrentLimit = IntakeConstants::intakeDeploySupplyCurrentLimit;
+    rightDeployLimits.SupplyCurrentLimitEnable = true;
+    rightDeployLimits.SupplyCurrentLimit = IntakeConstants::intakeDeploySupplyCurrentLimit;
         
     m_intakeDeployRightMotor.GetConfigurator().Apply(deployRightConfig);
 
