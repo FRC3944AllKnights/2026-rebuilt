@@ -160,8 +160,17 @@ void subsystems::ShooterSubsystem::SetIndexerSpeed(double speed) {
     // Set indexer motor speed
     // speed: speed from 0 to 1.0
 
-    // Stub
-    // TODO: Implement
+    if (speed <= 0.01) {
+        m_indexerLeftMotor.SetControl(NeutralOut{});
+    } else {
+        m_indexerLeftMotor.SetControl(DutyCycleOut{speed});
+    }
+
+    if (ShooterConstants::debugPrintsEnabled) {
+        frc::SmartDashboard::PutNumber("Indexer Commanded Speed", speed);
+        double actualRPM = m_indexerLeftMotor.GetRotorVelocity().GetValue().value() * 60.0;
+        frc::SmartDashboard::PutNumber("Indexer Actual RPM", actualRPM);
+    }
 }
 
 double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
