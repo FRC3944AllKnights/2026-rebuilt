@@ -5,6 +5,65 @@
 #include <units/angular_velocity.h>
 #include <units/current.h>
 #include <units/dimensionless.h>
+#include <string>
+
+namespace AprilTagConstants {
+    // All 32 AprilTag IDs for the 2026 Rebuilt & Welded field.
+    // Heights and field positions come from frc::AprilTagFieldLayout at runtime.
+    // Convention: odd IDs = centered on face, even IDs = offset.
+
+    // ── Red Hub (central hex structure) ──
+    constexpr int kRedHubNorthCenter   = 5;
+    constexpr int kRedHubNorthOffset   = 8;
+    constexpr int kRedHubSouthCenter   = 11;
+    constexpr int kRedHubSouthOffset   = 2;
+    constexpr int kRedHubWestCenter    = 9;
+    constexpr int kRedHubWestOffset    = 10;
+    constexpr int kRedHubEastCenter    = 3;
+    constexpr int kRedHubEastOffset    = 4;
+
+    // ── Blue Hub ──
+    constexpr int kBlueHubNorthCenter  = 27;
+    constexpr int kBlueHubNorthOffset  = 18;
+    constexpr int kBlueHubSouthCenter  = 21;
+    constexpr int kBlueHubSouthOffset  = 24;
+    constexpr int kBlueHubWestCenter   = 19;
+    constexpr int kBlueHubWestOffset   = 20;
+    constexpr int kBlueHubEastCenter   = 25;
+    constexpr int kBlueHubEastOffset   = 26;
+
+    // ── Red Trench (above/below hub) ──
+    constexpr int kRedTrenchNorthCenter  = 7;
+    constexpr int kRedTrenchNorthOffset  = 6;
+    constexpr int kRedTrenchSouthCenter  = 1;
+    constexpr int kRedTrenchSouthOffset  = 12;
+
+    // ── Blue Trench ──
+    constexpr int kBlueTrenchNorthCenter = 17;
+    constexpr int kBlueTrenchNorthOffset = 28;
+    constexpr int kBlueTrenchSouthCenter = 23;
+    constexpr int kBlueTrenchSouthOffset = 22;
+
+    // ── Red Outpost ──
+    constexpr int kRedOutpostCenter  = 13;
+    constexpr int kRedOutpostOffset  = 14;
+
+    // ── Blue Outpost ──
+    constexpr int kBlueOutpostCenter = 29;
+    constexpr int kBlueOutpostOffset = 30;
+
+    // ── Red Tower ──
+    constexpr int kRedTowerCenter  = 15;
+    constexpr int kRedTowerOffset  = 16;
+
+    // ── Blue Tower ──
+    constexpr int kBlueTowerCenter = 31;
+    constexpr int kBlueTowerOffset = 32;
+
+    // Convenience arrays
+    constexpr int kRedShooterTags[]  = { 9, 10 };
+    constexpr int kBlueShooterTags[] = { 25, 26 };
+}
 
 namespace ClimberConstants {
 
@@ -48,6 +107,10 @@ namespace IntakeConstants {
     const bool intakeDeployRightInverted = true;
 }
 
+namespace VisionConstants {
+    const std::string kLimelightName = "limelight-intake";
+}
+
 namespace ShooterConstants {
 
     // Hard dimensions
@@ -57,14 +120,12 @@ namespace ShooterConstants {
     const double shooterHeight = 20.0; // inches, measured from ball center at exit
     const double shooterOffsetFromRearBumper = 10.0; // inches
     const double forwardCameraHeight = 18.0; // inches
-    const double forwardCameraAngle = 45.0; // degrees
+    const double forwardCameraAngle = 0.0; // degrees (mounted level)
     const double forwardCameraShooterOffset = 6.0; // inches - distance between camera and ball exit
     
     const double hubHeight = 72.0; // inches
     const double hubTagHeight = 44.25; // inches
     const double hubWidthMax = 44.4; // inches (in x direction - parallel to driver view)
-    const int aprilTagIDHubRed = 9; // ID 10 is offset
-    const int aprilTagIDHubBlue = 25; // ID 26 is offset
 
     const double g = 386.2205; // inches per second^2 - gravitational acceleration on Earth surface
 
@@ -137,9 +198,10 @@ namespace CANConstants {
 
     const int kShooterLeftMotorId = 40;
     const int kShooterRightMotorId = 41;
-    const int kIndexerMotorId = 42;
+    const int kIndexerLeftMotorId = 42;
+    const int kIndexerRightMotorId = 50;
 
     // Climber
 
-    const int kClimberMotorId = 50;
+    // const int kClimberMotorId = 50;
 }

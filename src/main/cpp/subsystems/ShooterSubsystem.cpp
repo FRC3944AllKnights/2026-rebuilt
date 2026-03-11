@@ -40,14 +40,23 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
 
     // Indexer motor
 
-    TalonFXSConfiguration indexerMotorConfig{};
-    indexerMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
-    indexerMotorConfig.Slot0.WithKP(ShooterConstants::indexerP);
-    indexerMotorConfig.Slot0.WithKI(ShooterConstants::indexerI);
-    indexerMotorConfig.Slot0.WithKD(ShooterConstants::indexerD);
-    indexerMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
-    indexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_indexerMotor.GetConfigurator().Apply(indexerMotorConfig);
+    TalonFXSConfiguration indexerLeftMotorConfig{};
+    indexerLeftMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    indexerLeftMotorConfig.Slot0.WithKP(ShooterConstants::indexerP);
+    indexerLeftMotorConfig.Slot0.WithKI(ShooterConstants::indexerI);
+    indexerLeftMotorConfig.Slot0.WithKD(ShooterConstants::indexerD);
+    indexerLeftMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
+    indexerLeftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_indexerLeftMotor.GetConfigurator().Apply(indexerLeftMotorConfig);
+
+    TalonFXSConfiguration indexerRightMotorConfig{};
+    indexerRightMotorConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    indexerRightMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
+    indexerRightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_indexerRightMotor.GetConfigurator().Apply(indexerRightMotorConfig);   
+
+    Follower rightIndexerMotorControlMethod(CANConstants::kIndexerLeftMotorId, true); 
+    m_indexerRightMotor.SetControl(rightIndexerMotorControlMethod);
 
     // LED Strip
     //m_LEDStrip = LEDStrip(ShooterConstants::LEDPort, ShooterConstants::kLength);
@@ -56,6 +65,22 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     m_led.SetData(m_ledBuffer);
     m_led.Start();
     */
+}
+
+void subsystems::ShooterSubsystem::Periodic() {
+    // Passive debug telemetry — publish computed RPM without requiring trigger input
+    frc::SmartDashboard::PutBoolean("Shooter/AdjustableRPMEnabled", m_adjustableRPM);
+
+    if (m_vision != nullptr) {
+        bool isShootable = m_vision->HasValidShooterTarget();
+        if (m_adjustableRPM && isShootable) {
+            auto target = m_vision->getVisionTarget();
+            double computedRPM = getTargetShooterRPM(target.range);
+            frc::SmartDashboard::PutNumber("Shooter/ComputedRPM", computedRPM);
+        } else {
+            frc::SmartDashboard::PutNumber("Shooter/ComputedRPM", 0.0);
+        }
+    }
 }
 
 void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
@@ -69,12 +94,23 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
 
     // Determine target RPM
 
-    std::cout << "In spin up shooter method" << std::endl;
-
     units::revolutions_per_minute_t baseRPM = 6200.0_rpm; // For prototyping only
     double gearRatio = 1.0; // Torque multiplier
-    units::revolutions_per_minute_t targetRPM = speed * baseRPM / gearRatio;
-    units::turns_per_second_t targetTPS = targetRPM; // Convert RPM to TPS (turns per second)
+    units::revolutions_per_minute_t targetRPM;
+
+    if (m_adjustableRPM && m_vision != nullptr && speed > 0.01) {
+        if (m_vision->HasValidShooterTarget()) {
+            auto target = m_vision->getVisionTarget();
+            double computedRPM = getTargetShooterRPM(target.range);
+            targetRPM = units::revolutions_per_minute_t(computedRPM);
+        } else {
+            targetRPM = baseRPM / gearRatio;
+        }
+    } else {
+        targetRPM = speed * baseRPM / gearRatio;
+    }
+
+    units::turns_per_second_t targetTPS = targetRPM;
 
     // Apply to motor
 
@@ -85,19 +121,14 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
         m_shooterLeftMotor.SetControl(m_request.WithVelocity(targetTPS).WithSlot(0));
     }
 
-    std::cout << "Sets control" << std::endl;
-
     // Output to dashboard for testing
     
     frc::SmartDashboard::PutNumber("Shooter Wheel Target RPM", targetRPM.value());
     double actualRPM = m_shooterLeftMotor.GetRotorVelocity().GetValue().value() * 60.0;
     frc::SmartDashboard::PutNumber("Shooter Wheel Actual RPM", actualRPM);
-    std::cout << "Shooter Wheel Target RPM: " << targetRPM.value() << std::endl;
-    std::cout << "Shooter Wheel Actual RPM: " << actualRPM << std::endl;
 
     if (ShooterConstants::debugPrintsEnabled) {
         frc::SmartDashboard::PutNumber("Speed Commanded [0, 1]", speed);
-        std::cout << "Speed Commanded [0, 1]: " << speed << std::endl;
 
         double leftSupplyVoltage = m_shooterLeftMotor.GetSupplyVoltage().GetValue().value();
         double rightSupplyVoltage = m_shooterRightMotor.GetSupplyVoltage().GetValue().value();
@@ -129,8 +160,17 @@ void subsystems::ShooterSubsystem::SetIndexerSpeed(double speed) {
     // Set indexer motor speed
     // speed: speed from 0 to 1.0
 
-    // Stub
-    // TODO: Implement
+    if (speed <= 0.01) {
+        m_indexerLeftMotor.SetControl(NeutralOut{});
+    } else {
+        m_indexerLeftMotor.SetControl(DutyCycleOut{speed});
+    }
+
+    if (ShooterConstants::debugPrintsEnabled) {
+        frc::SmartDashboard::PutNumber("Indexer Commanded Speed", speed);
+        double actualRPM = m_indexerLeftMotor.GetRotorVelocity().GetValue().value() * 60.0;
+        frc::SmartDashboard::PutNumber("Indexer Actual RPM", actualRPM);
+    }
 }
 
 double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
@@ -158,11 +198,21 @@ double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
         b = std::tan(ShooterConstants::exitAngle * 3.14159 / 180.0);
     }
     double a = (ShooterConstants::hubHeight - ShooterConstants::shooterHeight - b * range) / (range * range);
-    double c = 2.0 * ShooterConstants::shooterHeight;
-    double determinant = b * b - 4.0 * a * c;
-    double range_floor_to_floor = -1.0 * b - std::sqrt(determinant) / (2.0 * a);
-    double exit_speed = std::sqrt(range_floor_to_floor * ShooterConstants::g / std::sin(b));
-    double rpm_nominal = exit_speed / ShooterConstants::shooterCircumference;
+
+    // Extract exit velocity directly from trajectory coefficient a.
+    // a encodes -g / (2 * v² * cos²θ), so solve for v:
+    double cosTheta = std::cos(ShooterConstants::exitAngle * 3.14159 / 180.0);
+    double exit_speed = std::sqrt(-ShooterConstants::g / (2.0 * a * cosTheta * cosTheta));
+    double rpm_nominal = (exit_speed / ShooterConstants::shooterCircumference) * 60.0;
+
+    if (ShooterConstants::debugPrintsEnabled) {
+        frc::SmartDashboard::PutNumber("Shooter/Debug/InputRange", rangeIn);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/ClampedRange", range);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/CoeffA", a);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/ExitSpeedInPerSec", exit_speed);
+        frc::SmartDashboard::PutNumber("Shooter/Debug/RPMNominal", rpm_nominal);
+    }
+
     return rpm_nominal * ShooterConstants::shooterBallSpeedTransferPercent;
 }
 

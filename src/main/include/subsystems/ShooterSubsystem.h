@@ -17,6 +17,7 @@
 
 #include "Constants.h"
 #include "subsystems/LEDStrip.h"
+#include "subsystems/VisionSubsystem.h"
 
 using namespace ctre::phoenix6::hardware;
 using namespace ctre::phoenix6::configs;
@@ -30,9 +31,14 @@ namespace subsystems {
         // Methods
 
         ShooterSubsystem();
+        void Periodic() override;
         void SpinUpShooter(double speed);
         void SetIndexerSpeed(double speed);
         double getTargetShooterRPM(double rangeIn);
+        void SetVision(VisionSubsystem* vision) { m_vision = vision; }
+        void SetAdjustableRPM(bool enabled) { m_adjustableRPM = enabled; }
+        void ToggleAdjustableRPM() { m_adjustableRPM = !m_adjustableRPM; }
+        bool IsAdjustableRPMEnabled() const { return m_adjustableRPM; }
 
     private:
 
@@ -45,7 +51,8 @@ namespace subsystems {
         
         TalonFXS m_shooterLeftMotor{CANConstants::kShooterLeftMotorId, CANConstants::kCANBusName};
         TalonFXS m_shooterRightMotor{CANConstants::kShooterRightMotorId, CANConstants::kCANBusName};
-        TalonFXS m_indexerMotor{CANConstants::kIndexerMotorId, CANConstants::kCANBusName};
+        TalonFXS m_indexerLeftMotor{CANConstants::kIndexerLeftMotorId, CANConstants::kCANBusName};
+        TalonFXS m_indexerRightMotor{CANConstants::kIndexerRightMotorId, CANConstants::kCANBusName};
         LEDStrip m_LEDStrip{ShooterConstants::LEDPort, ShooterConstants::kLength};
 
         // Members - Configs
@@ -53,6 +60,9 @@ namespace subsystems {
         TalonFXSConfiguration m_shooterLeftMotorConfig;
         TalonFXSConfiguration m_shooterRightMotorConfig;
         TalonFXSConfiguration m_indexerMotorConfig;
+
+        VisionSubsystem* m_vision = nullptr;
+        bool m_adjustableRPM = false;
 
         /*
         frc::AddressableLED m_led{1};

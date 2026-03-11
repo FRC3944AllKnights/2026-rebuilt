@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/MathUtil.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/RobotModeTriggers.h>
 #include <frc2/command/button/Trigger.h>
@@ -14,6 +15,9 @@ RobotContainer::RobotContainer()
 {
     facingAngle.HeadingController.SetPID(3, 0, 0.1);
     facingAngle.HeadingController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
+    // Wire vision subsystem to drivetrain for MegaTag2 + Kalman filter fusion
+    vision.SetDrivetrain(&drivetrain);
+
     ConfigureBindings();
 }
 
@@ -52,18 +56,25 @@ void RobotContainer::ConfigureBindings()
         .Until([this] { return intake.IsAtPosition(true); }));
 
     // Shooter controls
+    shooter.SetVision(&vision);
+
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {
         shooter.SpinUpShooter(0.0);
+        shooter.SetIndexerSpeed(0.0);
         }, {&shooter}));
+    joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
+        shooter.ToggleAdjustableRPM();
+        frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
+    }));
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
             std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
             shooter.SpinUpShooter(speed);
         }, {&shooter}));
     
-    joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this]
-        { shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
-        .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }));
+    joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this] {
+        std::cout << "Right Trigger Is Pressed" << std::endl;
+        shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }, {&shooter}));
 
     // Snap-to-45: Right stick button locks heading to nearest 45° while allowing translation
     joystick.RightStick().OnTrue(
