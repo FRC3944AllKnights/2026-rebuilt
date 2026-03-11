@@ -18,6 +18,12 @@ RobotContainer::RobotContainer()
     // Wire vision subsystem to drivetrain for MegaTag2 + Kalman filter fusion
     vision.SetDrivetrain(&drivetrain);
 
+    
+    // Configure autonomous chooser
+    m_autoChooser.SetDefaultOption("Drive Forward", std::string{kDriveForward});
+    m_autoChooser.AddOption("Do Nothing", std::string{kDoNothing});
+    frc::SmartDashboard::PutData("Auto Chooser", &m_autoChooser);
+
     ConfigureBindings();
 }
 
@@ -108,19 +114,21 @@ void RobotContainer::ConfigureBindings()
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-    // Simple drive forward auton
-    return frc2::cmd::Sequence(
-        // Reset our field centric heading to match the robot
-        // facing away from our alliance station wall (0 deg).
-        drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(frc::Rotation2d{0_deg}); }),
-        // Then slowly drive forward (away from us) for 5 seconds.
-        drivetrain.ApplyRequest([this]() -> auto&& {
-            return drive.WithVelocityX(0.5_mps)
-                .WithVelocityY(0_mps)
-                .WithRotationalRate(0_tps);
-        })
-        .WithTimeout(5_s),
-        // Finally idle for the rest of auton
-        drivetrain.ApplyRequest([] { return swerve::requests::Idle{}; })
-    );
+    auto selected = m_autoChooser.GetSelected();
+
+    if (selected == kDriveForward) {
+        return frc2::cmd::Sequence(
+            drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(frc::Rotation2d{0_deg}); }),
+            drivetrain.ApplyRequest([this]() -> auto&& {
+                return drive.WithVelocityX(0.5_mps)
+                    .WithVelocityY(0_mps)
+                    .WithRotationalRate(0_tps);
+            })
+            .WithTimeout(5_s),
+            drivetrain.ApplyRequest([] { return swerve::requests::Idle{}; })
+        );
+    }
+
+    // Default: Do Nothing
+    return frc2::cmd::None();
 }

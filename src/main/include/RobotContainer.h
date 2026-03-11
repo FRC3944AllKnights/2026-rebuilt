@@ -4,8 +4,11 @@
 
 #pragma once
 
+#include <frc/smartdashboard/SendableChooser.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
+#include <string>
 #include "subsystems/CommandSwerveDrivetrain.h"
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
@@ -50,7 +53,13 @@ public:
 
     frc2::CommandPtr GetAutonomousCommand();
 
+    // Auto mode string constants
+    static constexpr std::string_view kDoNothing = "Do Nothing";
+    static constexpr std::string_view kDriveForward = "Drive Forward";
+
 private:
     void ConfigureBindings();
     subsystems::VisionSubsystem::visionTarget hubVisionTarget;
+
+    frc::SendableChooser<std::string> m_autoChooser;
 };
