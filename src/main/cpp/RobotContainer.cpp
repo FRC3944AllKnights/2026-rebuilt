@@ -53,6 +53,7 @@ void RobotContainer::ConfigureBindings()
 
     shooter.SetDefaultCommand(frc2::cmd::Run([this] {
         shooter.SpinUpShooter(0.0);
+        shooter.SetIndexerSpeed(0.0);
         }, {&shooter}));
     joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
         shooter.ToggleAdjustableRPM();
@@ -66,8 +67,7 @@ void RobotContainer::ConfigureBindings()
     
     joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this] {
         std::cout << "Right Trigger Is Pressed" << std::endl;
-        shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }))
-        .WhileFalse(frc2::cmd::Run([this] { shooter.SetIndexerSpeed(0.0); }, {&shooter}));
+        shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }, {&shooter}));
 
     // Snap-to-45: Right stick button locks heading to nearest 45° while allowing translation
     joystick.RightStick().OnTrue(
