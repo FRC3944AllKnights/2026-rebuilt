@@ -12,7 +12,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     // --- Motor Type: NEO_JST --- 
     configs::CommutationConfigs &commutation = deployLeftConfig.Commutation;
-    commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO550_JST;
 
     // --- PID Slot 0: closed-loop position control gains ---
     configs::Slot0Configs &slot0 = deployLeftConfig.Slot0;
@@ -77,7 +77,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // === Roller Motor Configuration ===
     configs::TalonFXSConfiguration rollerConfig{};
     configs::CurrentLimitsConfigs &rollerLimits = rollerConfig.CurrentLimits;
-    rollerConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    rollerConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO550_JST;
     rollerLimits.SupplyCurrentLimitEnable = true;
     rollerLimits.SupplyCurrentLimit = IntakeConstants::intakeRollerSupplyCurrentLimit;
     m_intakeRollerMotor.GetConfigurator().Apply(rollerConfig);
