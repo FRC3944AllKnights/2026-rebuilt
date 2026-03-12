@@ -302,12 +302,14 @@ public:
         units::angular_velocity::radians_per_second_t inputRightX,
         swerve::requests::FieldCentric& drive);
 
+    void ToggleAutoXBrakingEnabled() { m_autoXBrake = !m_autoXBrake; }
 private:
     void StartSimThread();
 
     // Custom private members
 
     swerve::requests::SwerveDriveBrake brake{};
+    bool m_autoXBrake = false;
 };
 
 }

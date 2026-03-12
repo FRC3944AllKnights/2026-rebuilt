@@ -94,10 +94,10 @@ namespace IntakeConstants {
     constexpr auto intakeDeployJerk = 100_tr_per_s_cu;          // Take approximately 0.1 seconds to reach max accel
     
     // --- Position Targets (in mechanism rotations) ---
-    constexpr auto intakeDeployedPosition = 5.0_tr;   // Arm down / deployed — TODO: measure on real robot
+    constexpr auto intakeDeployedPosition = 10.0_tr;   // Arm down / deployed — TODO: measure on real robot
     constexpr auto intakeRetractedPosition = 0.0_tr;  // Arm up / retracted (home position)
         // --- Current Limits ---
-    constexpr auto intakeDeploySupplyCurrentLimit = 40.0_A;  // Amps — protects wiring and breakers
+    constexpr auto intakeDeploySupplyCurrentLimit = 20.0_A;  // Amps — protects wiring and breakers
     constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current
 
     // --- Position Tolerance ---
