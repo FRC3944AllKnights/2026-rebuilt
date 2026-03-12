@@ -143,9 +143,11 @@ namespace ShooterConstants {
 
     // PID
 
-    const units::dimensionless_t shooterP = 0.1;
-    const units::dimensionless_t shooterI = 0.0;
+    const units::dimensionless_t shooterP = 0.5;
+    const units::dimensionless_t shooterI = 0.5;
     const units::dimensionless_t shooterD = 0.0;
+    const units::dimensionless_t shooterS = 0.15;
+    const units::dimensionless_t shooterV = 0.127;
 
     const units::dimensionless_t indexerP = 0.1;
     const units::dimensionless_t indexerI = 0.0;

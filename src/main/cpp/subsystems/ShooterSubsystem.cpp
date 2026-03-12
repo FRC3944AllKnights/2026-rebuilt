@@ -17,7 +17,8 @@ subsystems::ShooterSubsystem::ShooterSubsystem() {
     shooterLeftMotorConfig.Slot0.WithKP(ShooterConstants::shooterP);
     shooterLeftMotorConfig.Slot0.WithKI(ShooterConstants::shooterI);
     shooterLeftMotorConfig.Slot0.WithKD(ShooterConstants::shooterD);
-    shooterLeftMotorConfig.Slot0.WithKV(0.12); // TODO: Measure. Found value online
+    shooterLeftMotorConfig.Slot0.WithKS(ShooterConstants::shooterS);
+    shooterLeftMotorConfig.Slot0.WithKV(ShooterConstants::shooterV); // TODO: Measure. Found value online
     shooterLeftMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0_A; // TODO: Determine appropriate current limit
     shooterLeftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_shooterLeftMotor.GetConfigurator().Apply(shooterLeftMotorConfig);
