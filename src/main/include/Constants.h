@@ -61,8 +61,8 @@ namespace AprilTagConstants {
     constexpr int kBlueTowerOffset = 32;
 
     // Convenience arrays
-    constexpr int kRedShooterTags[]  = { 9, 10 };
-    constexpr int kBlueShooterTags[] = { 25, 26 };
+    constexpr int kRedShooterTags[]  = { 9 };
+    constexpr int kBlueShooterTags[] = { 25 };
 }
 
 namespace ClimberConstants {
