@@ -33,7 +33,9 @@ private:
     /* Snap-to-45 heading lock request */
     swerve::requests::FieldCentricFacingAngle facingAngle = swerve::requests::FieldCentricFacingAngle{}
         .WithDeadband(MaxSpeed * 0.1)
-        .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
+        .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage)
+        .WithMaxAbsRotationalRate(MaxAngularRate)
+        .WithRotationalDeadband(MaxAngularRate * 0.1);
     units::degree_t m_snapHeading{0_deg};
 
     /* Note: This must be constructed before the drivetrain, otherwise we need to
