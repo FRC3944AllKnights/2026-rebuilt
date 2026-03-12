@@ -150,6 +150,10 @@ bool subsystems::VisionSubsystem::HasValidShooterTarget() const {
     return m_hasTarget && isHubTag;
 }
 
+double subsystems::VisionSubsystem::GetTX() const {
+    return LimelightHelpers::getTX(VisionConstants::kLimelightName);
+}
+
 void subsystems::VisionSubsystem::setVisionTarget(visionTarget &target) {
     target = subsystems::VisionSubsystem::getVisionTarget();
 }

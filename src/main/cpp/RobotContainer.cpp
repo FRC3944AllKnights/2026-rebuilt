@@ -20,8 +20,8 @@ RobotContainer::RobotContainer()
 
     
     // Configure autonomous chooser
-    m_autoChooser.SetDefaultOption("Drive Forward", std::string{kDriveForward});
-    m_autoChooser.AddOption("Do Nothing", std::string{kDoNothing});
+    m_autoChooser.SetDefaultOption("Drive Forward", std::string{kDoNothing});
+    m_autoChooser.AddOption("Do Nothing", std::string{kDriveForward});
     frc::SmartDashboard::PutData("Auto Chooser", &m_autoChooser);
 
     ConfigureBindings();
@@ -65,8 +65,8 @@ void RobotContainer::ConfigureBindings()
         intake.RunIntake(0.0);
     }, {&shooter}));
 
-    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(0.55); }));
-    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-0.55); }));
+    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }));
+    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }));
     joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake}));
     joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake}));
 
@@ -79,13 +79,11 @@ void RobotContainer::ConfigureBindings()
         }, {&shooter}));
 
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
-            std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
             shooter.SpinUpShooter(speed);
         }, {&shooter}));
     
     joystick.RightTrigger().WhileTrue(frc2::cmd::Run([this] {
-        std::cout << "Right Trigger Is Pressed" << std::endl;
         shooter.SetIndexerSpeed(joystick.GetRightTriggerAxis()); }, {&shooter}));
 
     // Snap-to-45: Right stick button locks heading to nearest 45° while allowing translation
@@ -102,6 +100,30 @@ void RobotContainer::ConfigureBindings()
                 .WithVelocityX(-frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
                 .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
                 .WithTargetDirection(frc::Rotation2d{m_snapHeading});
+        })
+    );
+
+    // Snap-to-hub: D-Pad Up auto rotates to center robot to the Hub AprilTag
+    joystick.POVUp().OnTrue(
+        frc2::cmd::RunOnce([this] {
+            facingAngle.HeadingController.Reset();
+        })
+    );
+
+    joystick.POVUp().WhileTrue(
+        drivetrain.ApplyRequest([this] {
+            if (vision.HasValidShooterTarget()) {
+                auto heading = drivetrain.GetState().Pose.Rotation().Degrees();
+                auto target = heading - units::degree_t{vision.GetTX()};
+                return facingAngle
+                    .WithVelocityX(-frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
+                    .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                    .WithTargetDirection(frc::Rotation2d{target});
+            }
+            return facingAngle
+                .WithVelocityX(-frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
+                .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                .WithTargetDirection(drivetrain.GetState().Pose.Rotation());
         })
     );
 

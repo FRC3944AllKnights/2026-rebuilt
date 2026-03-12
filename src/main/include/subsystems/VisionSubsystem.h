@@ -43,6 +43,7 @@ namespace subsystems {
         void SetDrivetrain(CommandSwerveDrivetrain* drivetrain) { m_drivetrain = drivetrain; }
 
         bool HasValidShooterTarget() const;
+        double GetTX() const;
 
     private:
         double degreesToRadians(double degrees);

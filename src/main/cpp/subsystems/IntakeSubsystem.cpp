@@ -49,6 +49,11 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     softLimits.ReverseSoftLimitEnable = true;
     softLimits.ReverseSoftLimitThreshold = IntakeConstants::intakeRetractedPosition;
 
+    // --- Motor Outputs: brake on boot ---
+    configs::MotorOutputConfigs &motorConfigs = deployLeftConfig.MotorOutput;
+
+    motorConfigs.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
+
     // Apply configuration to the left deploy motor (leader)
     m_intakeDeployLeftMotor.GetConfigurator().Apply(deployLeftConfig);
 
@@ -65,6 +70,11 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     rightDeployLimits.SupplyCurrentLimitEnable = true;
     rightDeployLimits.SupplyCurrentLimit = IntakeConstants::intakeDeploySupplyCurrentLimit;
+
+    // --- Motor Outputs: brake on boot ---
+    configs::MotorOutputConfigs &rightMotorConfigs = deployRightConfig.MotorOutput;
+    
+    rightMotorConfigs.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
         
     m_intakeDeployRightMotor.GetConfigurator().Apply(deployRightConfig);
 
@@ -103,6 +113,8 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     auto targetPosition = up
         ? IntakeConstants::intakeRetractedPosition
         : IntakeConstants::intakeDeployedPosition;
+
+    m_targetPosition = targetPosition;
     m_intakeDeployLeftMotor.SetControl(
         controls::MotionMagicVoltage{targetPosition}
     );
@@ -111,10 +123,9 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     );
 }
 
-bool subsystems::IntakeSubsystem::IsAtPosition(bool up) {
-    auto targetPosition = up
-        ? IntakeConstants::intakeRetractedPosition
-        : IntakeConstants::intakeDeployedPosition;
-    auto currentPosition = m_intakeDeployLeftMotor.GetPosition().GetValue();
-    return units::math::abs(currentPosition - targetPosition) < IntakeConstants::intakePositionTolerance;
+void subsystems::IntakeSubsystem::HoldDeployPosition() {
+    m_intakeDeployLeftMotor.SetControl(
+        controls::MotionMagicVoltage{m_targetPosition}
+    );
 }
+

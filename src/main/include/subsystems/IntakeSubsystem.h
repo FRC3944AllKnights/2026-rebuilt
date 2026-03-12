@@ -24,7 +24,8 @@ namespace subsystems {
         IntakeSubsystem();
         void RunIntake(double speed);
         void SetIntakePosition(bool up);
-        bool IsAtPosition(bool up);
+        void HoldDeployPosition();
+
     private:
 
         // Members - Motors
@@ -32,6 +33,8 @@ namespace subsystems {
         TalonFXS m_intakeDeployLeftMotor{CANConstants::kIntakeDeployLeftMotorId, CANConstants::kCANBusName};
         TalonFXS m_intakeDeployRightMotor{CANConstants::kIntakeDeployRightMotorId, CANConstants::kCANBusName};
         TalonFXS m_intakeRollerMotor{CANConstants::kIntakeRollerMotorId, CANConstants::kCANBusName};
+
+        units::turn_t m_targetPosition{IntakeConstants::intakeRetractedPosition};
         
 };
 } // namespace subsystems

@@ -94,7 +94,7 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
 
     // Determine target RPM
 
-    units::revolutions_per_minute_t baseRPM = 6200.0_rpm; // For prototyping only
+    units::revolutions_per_minute_t baseRPM = 4650.0_rpm; // For prototyping only
     double gearRatio = 1.0; // Torque multiplier
     units::revolutions_per_minute_t targetRPM;
 
