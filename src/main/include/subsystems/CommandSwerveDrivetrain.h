@@ -302,6 +302,7 @@ public:
         units::angular_velocity::radians_per_second_t inputRightX,
         swerve::requests::FieldCentric& drive);
 
+    bool IsAutoXBrakingEnabled() const { return m_autoXBrake; }
     void ToggleAutoXBrakingEnabled() { m_autoXBrake = !m_autoXBrake; }
 private:
     void StartSimThread();

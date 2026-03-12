@@ -50,16 +50,25 @@ void RobotContainer::ConfigureBindings()
         }).IgnoringDisable(true)
     );
 
+    // Smart Controls
+
+    joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
+        shooter.ToggleAdjustableRPM();
+        drivetrain.ToggleAutoXBrakingEnabled();
+        frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
+        frc::SmartDashboard::PutBoolean("Auto X-Braking Enabled", drivetrain.IsAutoXBrakingEnabled());
+    }));
+
     // Intake controls
 
-    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }))
-        .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
-    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }))
-        .OnFalse(frc2::cmd::Run([this] { intake.RunIntake(0.0); }));
-    joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake})
-        .Until([this] { return intake.IsAtPosition(false); }));
-    joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake})
-        .Until([this] { return intake.IsAtPosition(true); }));
+    intake.SetDefaultCommand(frc2::cmd::Run([this] {
+        intake.RunIntake(0.0);
+    }, {&shooter}));
+
+    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(0.55); }));
+    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-0.55); }));
+    joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake}));
+    joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake}));
 
     // Shooter controls
     shooter.SetVision(&vision);
@@ -68,10 +77,7 @@ void RobotContainer::ConfigureBindings()
         shooter.SpinUpShooter(0.0);
         shooter.SetIndexerSpeed(0.0);
         }, {&shooter}));
-    joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
-        shooter.ToggleAdjustableRPM();
-        frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
-    }));
+
     joystick.LeftTrigger().WhileTrue(frc2::cmd::Run([this] {
             std::cout << "Left Trigger Is Pressed" << std::endl;
             double speed = joystick.GetLeftTriggerAxis();
