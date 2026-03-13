@@ -14,6 +14,7 @@
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
 #include "subsystems/VisionSubsystem.h"
+#include "AutonRoutines.h"
 #include "Telemetry.h"
 #include <iostream>
 #include <cmath>
@@ -55,13 +56,10 @@ public:
 
     frc2::CommandPtr GetAutonomousCommand();
 
-    // Auto mode string constants
-    static constexpr std::string_view kDoNothing = "Do Nothing";
-    static constexpr std::string_view kDriveForward = "Drive Forward";
-
 private:
     void ConfigureBindings();
     subsystems::VisionSubsystem::visionTarget hubVisionTarget;
 
+    AutonRoutines m_autonRoutines{drivetrain, drive, intake, shooter, vision};
     frc::SendableChooser<std::string> m_autoChooser;
 };
