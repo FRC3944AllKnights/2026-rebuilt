@@ -303,7 +303,7 @@ public:
         swerve::requests::FieldCentric& drive);
 
     bool IsAutoXBrakingEnabled() const { return m_autoXBrake; }
-    void ToggleAutoXBrakingEnabled() { m_autoXBrake = !m_autoXBrake; }
+    void ToggleAutoXBraking() { m_autoXBrake = !m_autoXBrake; }
 private:
     void StartSimThread();
 

@@ -20,8 +20,8 @@ RobotContainer::RobotContainer()
 
     
     // Configure autonomous chooser
-    m_autoChooser.SetDefaultOption("Drive Forward", std::string{AutonRoutines::kDriveForward});
-    m_autoChooser.AddOption("Do Nothing", std::string{AutonRoutines::kDoNothing});
+    m_autoChooser.SetDefaultOption("Do Nothing", std::string{AutonRoutines::kDoNothing});
+    m_autoChooser.AddOption("Drive Forward", std::string{AutonRoutines::kDriveForward});
     frc::SmartDashboard::PutData("Auto Chooser", &m_autoChooser);
 
     ConfigureBindings();
@@ -54,8 +54,11 @@ void RobotContainer::ConfigureBindings()
 
     joystick.Back().OnTrue(frc2::cmd::RunOnce([this] {
         shooter.ToggleAdjustableRPM();
-        drivetrain.ToggleAutoXBrakingEnabled();
         frc::SmartDashboard::PutBoolean("Shooter Adjustable RPM Enabled", shooter.IsAdjustableRPMEnabled());
+    }));
+
+    joystick.RightBumper().OnTrue(frc2::cmd::RunOnce([this] {
+        drivetrain.ToggleAutoXBraking();
         frc::SmartDashboard::PutBoolean("Auto X-Braking Enabled", drivetrain.IsAutoXBrakingEnabled());
     }));
 
@@ -67,8 +70,8 @@ void RobotContainer::ConfigureBindings()
 
     joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }));
     joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }));
-    joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake}));
-    joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake}));
+    //joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake}));
+    //joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake}));
 
     // Shooter controls
     shooter.SetVision(&vision);
