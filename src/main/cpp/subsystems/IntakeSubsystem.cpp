@@ -9,6 +9,7 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // === Deploy Motor Configuration ===
     // Create a configuration object
     configs::TalonFXSConfiguration deployLeftConfig{};
+    deployLeftConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
 
     // --- Motor Type: NEO_JST --- 
     configs::CommutationConfigs &commutation = deployLeftConfig.Commutation;
@@ -44,10 +45,10 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     // --- Software Limits: prevent mechanism from trying to move beyond physical limits ---
     configs::SoftwareLimitSwitchConfigs &softLimits = deployLeftConfig.SoftwareLimitSwitch;
-    softLimits.ForwardSoftLimitEnable = true;
-    softLimits.ForwardSoftLimitThreshold = IntakeConstants::intakeDeployedPosition;
-    softLimits.ReverseSoftLimitEnable = true;
-    softLimits.ReverseSoftLimitThreshold = IntakeConstants::intakeRetractedPosition;
+    //softLimits.ForwardSoftLimitEnable = true;
+    //softLimits.ForwardSoftLimitThreshold = IntakeConstants::intakeDeployedPosition;
+    //softLimits.ReverseSoftLimitEnable = true;
+    //softLimits.ReverseSoftLimitThreshold = IntakeConstants::intakeRetractedPosition;
 
     // --- Motor Outputs: brake on boot ---
     configs::MotorOutputConfigs &motorConfigs = deployLeftConfig.MotorOutput;
@@ -57,12 +58,13 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
     // Apply configuration to the left deploy motor (leader)
     m_intakeDeployLeftMotor.GetConfigurator().Apply(deployLeftConfig);
 
-    configs::TalonFXSConfiguration deployRightConfig{};
+    configs::TalonFXSConfiguration deployRightConfig = deployLeftConfig;
+    deployRightConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
 
     // --- Motor Type: NEO_JST --- 
 
     configs::CommutationConfigs &rightCommutation = deployRightConfig.Commutation;
-    rightCommutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
+    rightCommutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO550_JST;
 
     // --- Current Limits: protect motors and wiring ---
 
@@ -80,14 +82,14 @@ subsystems::IntakeSubsystem::IntakeSubsystem() {
 
     // Set the right motor to follow the left motor's output
     // The bool parameter inverts the follower's direction (true = oppose leader)
-    m_intakeDeployRightMotor.SetControl(
-        controls::Follower{m_intakeDeployLeftMotor.GetDeviceID(), IntakeConstants::intakeDeployRightInverted}
-    );
+    //m_intakeDeployRightMotor.SetControl(
+    //    controls::Follower{m_intakeDeployLeftMotor.GetDeviceID(), IntakeConstants::intakeDeployRightInverted}
+    //);
 
     // === Roller Motor Configuration ===
     configs::TalonFXSConfiguration rollerConfig{};
     configs::CurrentLimitsConfigs &rollerLimits = rollerConfig.CurrentLimits;
-    rollerConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO550_JST;
+    rollerConfig.Commutation.MotorArrangement = ctre::phoenix6::signals::MotorArrangementValue::NEO_JST;
     rollerLimits.SupplyCurrentLimitEnable = true;
     rollerLimits.SupplyCurrentLimit = IntakeConstants::intakeRollerSupplyCurrentLimit;
     m_intakeRollerMotor.GetConfigurator().Apply(rollerConfig);
@@ -109,7 +111,13 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     // up: true = retracted (stowed), false = deployed (down to collect game pieces)
     // MotionMagicVoltage tells the motor controller to go to an exact position
     // following the trapezoidal/S-curve profile configured in the constructor
-    std::cout << "In set intake position" << std::endl;
+
+    if (!m_hasDisengagedLatches) {
+        std::cout << "Not disengaged" << std::endl;
+        DisengageLatches();
+        m_hasDisengagedLatches = true;
+    }
+
     auto targetPosition = up
         ? IntakeConstants::intakeRetractedPosition
         : IntakeConstants::intakeDeployedPosition;
@@ -119,7 +127,16 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
         controls::MotionMagicVoltage{targetPosition}
     );
     m_intakeDeployRightMotor.SetControl(
-        controls::Follower{m_intakeDeployLeftMotor.GetDeviceID(), IntakeConstants::intakeDeployRightInverted}
+        controls::MotionMagicVoltage{targetPosition}
+    );
+}
+
+void subsystems::IntakeSubsystem::DisengageLatches() {
+    m_intakeDeployLeftMotor.SetControl(
+        controls::MotionMagicVoltage{IntakeConstants::intakeUnlatchPosition}
+    );
+    m_intakeDeployRightMotor.SetControl(
+        controls::MotionMagicVoltage{IntakeConstants::intakeUnlatchPosition}
     );
 }
 

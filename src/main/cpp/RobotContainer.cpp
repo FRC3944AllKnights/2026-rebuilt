@@ -37,7 +37,7 @@ void RobotContainer::ConfigureBindings()
         // Else: drive normally
         frc2::cmd::Run([this] { drivetrain.DriveDefaultCommand(
             frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed, // Drive forward with negative Y (forward)
-            -frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed, // Drive left with negative X (left)
+            frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed, // Drive left with negative X (left)
             -frc::ApplyDeadband(joystick.GetRightX(), 0.1) * MaxAngularRate, // Drive counterclockwise with negative X (left)
             drive);}, {&drivetrain})
     );
@@ -66,12 +66,13 @@ void RobotContainer::ConfigureBindings()
 
     intake.SetDefaultCommand(frc2::cmd::Run([this] {
         intake.RunIntake(0.0);
+        intake.HoldDeployPosition();
     }, {&intake}));
 
     joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }));
     joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }));
-    //joystick.X().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(false); }, {&intake}));
-    //joystick.Y().OnTrue(frc2::cmd::Run([this] { intake.SetIntakePosition(true); }, {&intake}));
+    joystick.X().OnTrue(frc2::cmd::RunOnce([this] { intake.SetIntakePosition(false); }, {&intake}));
+    joystick.Y().OnTrue(frc2::cmd::RunOnce([this] { intake.SetIntakePosition(true); }, {&intake}));
 
     // Shooter controls
     shooter.SetVision(&vision);
@@ -101,7 +102,7 @@ void RobotContainer::ConfigureBindings()
         drivetrain.ApplyRequest([this]() -> auto&& {
             return facingAngle
                 .WithVelocityX(frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
-                .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                .WithVelocityY(frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
                 .WithTargetDirection(frc::Rotation2d{m_snapHeading});
         })
     );
@@ -114,12 +115,12 @@ void RobotContainer::ConfigureBindings()
                 auto target = heading - units::degree_t{vision.GetTX()};
                 return facingAngle
                     .WithVelocityX(frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
-                    .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                    .WithVelocityY(frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
                     .WithTargetDirection(frc::Rotation2d{target});
             }
             return facingAngle
                 .WithVelocityX(frc::ApplyDeadband(joystick.GetLeftY(), 0.1) * MaxSpeed)
-                .WithVelocityY(-frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
+                .WithVelocityY(frc::ApplyDeadband(joystick.GetLeftX(), 0.1) * MaxSpeed)
                 .WithTargetDirection(drivetrain.GetState().Pose.Rotation());
         })
     );
