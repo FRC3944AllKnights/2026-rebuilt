@@ -9,6 +9,7 @@ AutonRoutines::AutonRoutines(
     subsystems::ShooterSubsystem& shooter,
     subsystems::VisionSubsystem& vision)
     : m_drivetrain{drivetrain},
+      m_drive{drive},
       m_intake{intake},
       m_shooter{shooter},
       m_vision{vision}
