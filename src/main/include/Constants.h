@@ -95,8 +95,7 @@ namespace IntakeConstants {
     
     // --- Position Targets (in mechanism rotations) ---
     constexpr auto intakeDeployedPosition = 50.0_tr;   // Arm down / deployed — TODO: measure on real robot
-    constexpr auto intakeRetractedPosition = 0.0_tr;      // Arm up / retracted (home position)
-    constexpr auto intakeUnlatchPosition = -5.0_tr;  // Arm up / disengage latches
+    constexpr auto intakeRetractedPosition = -5.0_tr;      // Arm up / retracted (home position)
         // --- Current Limits ---
     constexpr auto intakeDeploySupplyCurrentLimit = 20.0_A;  // Amps — protects wiring and breakers
     constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current

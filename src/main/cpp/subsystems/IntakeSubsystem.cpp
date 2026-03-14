@@ -112,12 +112,6 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     // MotionMagicVoltage tells the motor controller to go to an exact position
     // following the trapezoidal/S-curve profile configured in the constructor
 
-    if (!m_hasDisengagedLatches) {
-        std::cout << "Not disengaged" << std::endl;
-        DisengageLatches();
-        m_hasDisengagedLatches = true;
-    }
-
     auto targetPosition = up
         ? IntakeConstants::intakeRetractedPosition
         : IntakeConstants::intakeDeployedPosition;
@@ -128,15 +122,6 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     );
     m_intakeDeployRightMotor.SetControl(
         controls::MotionMagicVoltage{targetPosition}
-    );
-}
-
-void subsystems::IntakeSubsystem::DisengageLatches() {
-    m_intakeDeployLeftMotor.SetControl(
-        controls::MotionMagicVoltage{IntakeConstants::intakeUnlatchPosition}
-    );
-    m_intakeDeployRightMotor.SetControl(
-        controls::MotionMagicVoltage{IntakeConstants::intakeUnlatchPosition}
     );
 }
 
