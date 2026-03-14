@@ -66,5 +66,10 @@ namespace subsystems {
         double m_ta = 0.0;
         double m_range = 0.0;
         int m_tagID = -1;
+
+        // Shooter-specific cached values from raw fiducial scan
+        double m_shooterTX = 0.0;
+        double m_shooterTY = 0.0;
+        int m_shooterTagID = -1;
     };
 } // namespace subsystems

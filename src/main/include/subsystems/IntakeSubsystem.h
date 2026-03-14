@@ -24,7 +24,14 @@ namespace subsystems {
         IntakeSubsystem();
         void RunIntake(double speed);
         void SetIntakePosition(bool up);
+        void SetDeployTarget(units::turn_t position);
         void HoldDeployPosition();
+        bool IsAtPosition();
+        units::turn_t GetCurrentPosition();
+        units::turn_t GetTargetPosition();
+        void JogPosition(units::turn_t step);
+        void PublishTelemetry();
+        frc2::CommandPtr PrimeIntakeCommand();
 
     private:
 
@@ -34,6 +41,6 @@ namespace subsystems {
         TalonFXS m_intakeDeployRightMotor{CANConstants::kIntakeDeployRightMotorId, CANConstants::kCANBusName};
         TalonFXS m_intakeRollerMotor{CANConstants::kIntakeRollerMotorId, CANConstants::kCANBusName};
 
-        units::turn_t m_targetPosition{IntakeConstants::intakeRetractedPosition};
+        units::turn_t m_targetPosition{IntakeConstants::intakeStartPosition};
 };
 } // namespace subsystems

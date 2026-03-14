@@ -1,6 +1,7 @@
 #include "subsystems/IntakeSubsystem.h"
 #include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc/RobotController.h>
+#include <frc2/command/Commands.h>
 #include <iostream>
 
 using namespace ctre::phoenix6;
@@ -125,9 +126,61 @@ void subsystems::IntakeSubsystem::SetIntakePosition(bool up) {
     );
 }
 
+void subsystems::IntakeSubsystem::SetDeployTarget(units::turn_t position) {
+    m_targetPosition = position;
+    m_intakeDeployLeftMotor.SetControl(
+        controls::MotionMagicVoltage{position}
+    );
+    m_intakeDeployRightMotor.SetControl(
+        controls::MotionMagicVoltage{position}
+    );
+}
+
 void subsystems::IntakeSubsystem::HoldDeployPosition() {
     m_intakeDeployLeftMotor.SetControl(
         controls::MotionMagicVoltage{m_targetPosition}
+    );
+    m_intakeDeployRightMotor.SetControl(
+        controls::MotionMagicVoltage{m_targetPosition}
+    );
+}
+
+bool subsystems::IntakeSubsystem::IsAtPosition() {
+    auto currentPosition = m_intakeDeployLeftMotor.GetPosition().GetValue();
+    return units::math::abs(currentPosition - m_targetPosition) < IntakeConstants::intakePositionTolerance;
+}
+
+units::turn_t subsystems::IntakeSubsystem::GetCurrentPosition() {
+    return m_intakeDeployLeftMotor.GetPosition().GetValue();
+}
+
+units::turn_t subsystems::IntakeSubsystem::GetTargetPosition() {
+    return m_targetPosition;
+}
+
+void subsystems::IntakeSubsystem::JogPosition(units::turn_t step) {
+    m_targetPosition += step;
+    m_intakeDeployLeftMotor.SetControl(
+        controls::MotionMagicVoltage{m_targetPosition}
+    );
+    m_intakeDeployRightMotor.SetControl(
+        controls::MotionMagicVoltage{m_targetPosition}
+    );
+}
+
+void subsystems::IntakeSubsystem::PublishTelemetry() {
+    frc::SmartDashboard::PutNumber("Intake/Current Position (tr)",
+        m_intakeDeployLeftMotor.GetPosition().GetValue().value());
+    frc::SmartDashboard::PutNumber("Intake/Target Position (tr)",
+        m_targetPosition.value());
+}
+
+frc2::CommandPtr subsystems::IntakeSubsystem::PrimeIntakeCommand() {
+    return frc2::cmd::Sequence(
+        frc2::cmd::RunOnce([this] { SetDeployTarget(IntakeConstants::intakeRetractedPosition); }, {this}),
+        frc2::cmd::WaitUntil([this] { return IsAtPosition(); }).WithTimeout(2_s),
+        frc2::cmd::RunOnce([this] { SetDeployTarget(IntakeConstants::intakeStartPosition); }, {this}),
+        frc2::cmd::WaitUntil([this] { return IsAtPosition(); }).WithTimeout(2_s)
     );
 }
 

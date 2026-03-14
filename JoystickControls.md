@@ -23,9 +23,9 @@
 
 ### D-Pad
 - D-Pad Up: Align With Hub (Shooting)
-- D-Pad Right: 
+- D-Pad Right: Jog Intake Deploy + (Test Mode Only)
 - D-Pad Down: Align With Tower (Climbing)
-- D-Pad Left: 
+- D-Pad Left: Jog Intake Deploy - (Test Mode Only)
 
 ### Menu
 - Back: 

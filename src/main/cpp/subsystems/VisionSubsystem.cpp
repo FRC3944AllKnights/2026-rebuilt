@@ -78,6 +78,37 @@ void subsystems::VisionSubsystem::Periodic() {
         }
     }
 
+    // Scan all visible fiducials for the specific shooter tag (9 or 25)
+    m_hasShooterTarget = false;
+    auto rawFiducials = LimelightHelpers::getRawFiducials(VisionConstants::kLimelightName);
+    for (const auto& fid : rawFiducials) {
+        for (int id : AprilTagConstants::kRedShooterTags) {
+            if (fid.id == id) {
+                m_hasShooterTarget = true;
+                m_shooterTX = fid.txnc;
+                m_shooterTY = fid.tync;
+                m_shooterTagID = fid.id;
+                break;
+            }
+        }
+        if (m_hasShooterTarget) break;
+        for (int id : AprilTagConstants::kBlueShooterTags) {
+            if (fid.id == id) {
+                m_hasShooterTarget = true;
+                m_shooterTX = fid.txnc;
+                m_shooterTY = fid.tync;
+                m_shooterTagID = fid.id;
+                break;
+            }
+        }
+        if (m_hasShooterTarget) break;
+    }
+    if (!m_hasShooterTarget) {
+        m_shooterTX = 0.0;
+        m_shooterTY = 0.0;
+        m_shooterTagID = -1;
+    }
+
     // Publish to SmartDashboard
     frc::SmartDashboard::PutBoolean("Vision/HasTarget", m_hasTarget);
     frc::SmartDashboard::PutNumber("Vision/TX", m_tx);
@@ -97,21 +128,16 @@ void subsystems::VisionSubsystem::Periodic() {
 }
 
 subsystems::VisionSubsystem::visionTarget subsystems::VisionSubsystem::getVisionTarget() {
-    // Check if the detected tag is any hub tag (center or offset, either alliance)
-    bool isHubTag = HasValidShooterTarget();
-
-    if (m_hasTarget && isHubTag) {
-        // If hub AprilTag visible, determine visionTarget using cached tx/ty
-
-        // Use per-tag height from field layout
-        double tagHeight = GetTagHeightInches(m_tagID);
+    if (m_hasShooterTarget) {
+        // Use shooter-specific tag data from raw fiducial scan
+        double tagHeight = GetTagHeightInches(m_shooterTagID);
         double heightToCover = tagHeight - ShooterConstants::forwardCameraHeight;
-        double angleToCover = m_ty + ShooterConstants::forwardCameraAngle;
+        double angleToCover = m_shooterTY + ShooterConstants::forwardCameraAngle;
         double distanceToTag = heightToCover / std::tan(degreesToRadians(angleToCover));
 
         // Calculate distance from shooter to hub center
-        double xOffsetFromHub = distanceToTag * std::cos(degreesToRadians(m_tx));
-        double yOffsetFromHub = distanceToTag * std::sin(degreesToRadians(m_tx));
+        double xOffsetFromHub = distanceToTag * std::cos(degreesToRadians(m_shooterTX));
+        double yOffsetFromHub = distanceToTag * std::sin(degreesToRadians(m_shooterTX));
         double xOffsetFromTarget = xOffsetFromHub + ShooterConstants::hubWidthMax / 2.0;
 
         double overheadAngleTarget = std::atan(xOffsetFromTarget / yOffsetFromHub);
@@ -121,7 +147,7 @@ subsystems::VisionSubsystem::visionTarget subsystems::VisionSubsystem::getVision
         return visionTarget{overheadAngleTarget, range};
     }
     else {
-        // If hub AprilTag not visible, shoot straight ahead, assuming robot is at base position
+        // If shooter AprilTag not visible, shoot straight ahead, assuming robot is at base position
         double angle = 0.0;
         double range = ShooterConstants::baseRange - ShooterConstants::shooterOffsetFromRearBumper;
         return visionTarget{angle, range};
@@ -129,29 +155,11 @@ subsystems::VisionSubsystem::visionTarget subsystems::VisionSubsystem::getVision
 }
 
 bool subsystems::VisionSubsystem::HasValidShooterTarget() const {
-    // Check if the detected tag is any hub tag (center or offset, either alliance)
-    bool isHubTag = false;
-    for (int id : AprilTagConstants::kRedShooterTags)  { 
-        if (m_tagID == id) { 
-            isHubTag = true; 
-            break; 
-        } 
-    }
-
-    if (!isHubTag) { 
-        for (int id : AprilTagConstants::kBlueShooterTags) { 
-            if (m_tagID == id) { 
-                isHubTag = true; 
-                break; 
-            } 
-        } 
-    }
-
-    return m_hasTarget && isHubTag;
+    return m_hasShooterTarget;
 }
 
 double subsystems::VisionSubsystem::GetTX() const {
-    return LimelightHelpers::getTX(VisionConstants::kLimelightName);
+    return m_shooterTX;
 }
 
 void subsystems::VisionSubsystem::setVisionTarget(visionTarget &target) {

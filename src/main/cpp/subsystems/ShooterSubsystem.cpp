@@ -95,7 +95,7 @@ void subsystems::ShooterSubsystem::SpinUpShooter(double speed) {
 
     // Determine target RPM
 
-    units::revolutions_per_minute_t baseRPM = 3200.0_rpm; // For prototyping only
+    units::revolutions_per_minute_t baseRPM = 2950.0_rpm; // For prototyping only
     double gearRatio = 1.0; // Torque multiplier
     units::revolutions_per_minute_t targetRPM;
 
@@ -214,7 +214,7 @@ double subsystems::ShooterSubsystem::getTargetShooterRPM(double rangeIn) {
         frc::SmartDashboard::PutNumber("Shooter/Debug/RPMNominal", rpm_nominal);
     }
 
-    return rpm_nominal * ShooterConstants::shooterBallSpeedTransferPercent;
+    return rpm_nominal / ShooterConstants::shooterBallSpeedTransferPercent;
 }
 
 double subsystems::ShooterSubsystem::degreesToRadians(double degrees) {

@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 
+#include <frc/DriverStation.h>
 #include <frc/MathUtil.h>
 #include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
@@ -64,9 +65,35 @@ void RobotContainer::ConfigureBindings()
 
     // Intake controls
 
+    // Auto-prime: retract to unlatch, then return to start position
+    frc2::RobotModeTriggers::Teleop().OnTrue(intake.PrimeIntakeCommand());
+
+    // Intake jog tuning (Test mode only)
+    frc::SmartDashboard::PutNumber("Intake/Deploy Jog Step (tr)", IntakeConstants::intakeDeployJogStep.value());
+    frc::SmartDashboard::PutNumber("Intake/Retract Jog Step (tr)", IntakeConstants::intakeRetractJogStep.value());
+
+    joystick.POVRight().OnTrue(frc2::cmd::RunOnce([this] {
+        if (frc::DriverStation::IsTest()) {
+            auto step = units::turn_t{
+                frc::SmartDashboard::GetNumber("Intake/Deploy Jog Step (tr)",
+                    IntakeConstants::intakeDeployJogStep.value())};
+            intake.JogPosition(step);
+        }
+    }, {&intake}));
+
+    joystick.POVLeft().OnTrue(frc2::cmd::RunOnce([this] {
+        if (frc::DriverStation::IsTest()) {
+            auto step = units::turn_t{
+                frc::SmartDashboard::GetNumber("Intake/Retract Jog Step (tr)",
+                    IntakeConstants::intakeRetractJogStep.value())};
+            intake.JogPosition(-step);
+        }
+    }, {&intake}));
+
     intake.SetDefaultCommand(frc2::cmd::Run([this] {
         intake.RunIntake(0.0);
         intake.HoldDeployPosition();
+        intake.PublishTelemetry();
     }, {&intake}));
 
     joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }));

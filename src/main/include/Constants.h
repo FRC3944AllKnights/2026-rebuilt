@@ -96,12 +96,17 @@ namespace IntakeConstants {
     // --- Position Targets (in mechanism rotations) ---
     constexpr auto intakeDeployedPosition = 50.0_tr;   // Arm down / deployed — TODO: measure on real robot
     constexpr auto intakeRetractedPosition = -5.0_tr;      // Arm up / retracted (home position)
+    constexpr auto intakeStartPosition = 0.0_tr;           // Starting position (latched home)
         // --- Current Limits ---
     constexpr auto intakeDeploySupplyCurrentLimit = 20.0_A;  // Amps — protects wiring and breakers
     constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current
 
     // --- Position Tolerance ---
     constexpr auto intakePositionTolerance = 0.05_tr;
+
+    // --- Jog Tuning (Test Mode) ---
+    constexpr auto intakeDeployJogStep = 5.0_tr;
+    constexpr auto intakeRetractJogStep = 0.5_tr;
 
     // --- Motor Inversion ---
     const bool intakeDeployRightInverted = true;
@@ -120,8 +125,8 @@ namespace ShooterConstants {
     const double shooterHeight = 20.0; // inches, measured from ball center at exit
     const double shooterOffsetFromRearBumper = 10.0; // inches
     const double forwardCameraHeight = 18.0; // inches
-    const double forwardCameraAngle = 0.0; // degrees (mounted level)
-    const double forwardCameraShooterOffset = 6.0; // inches - distance between camera and ball exit
+    const double forwardCameraAngle = 15.0; // degrees (mounted level)
+    const double forwardCameraShooterOffset = 0.0; // inches - distance between camera and ball exit
     
     const double hubHeight = 72.0; // inches
     const double hubTagHeight = 44.25; // inches
@@ -131,13 +136,13 @@ namespace ShooterConstants {
 
     // Empirical (not yet measured as of Feb 3 2026)
 
-    const double shooterBallSpeedTransferPercent = 1.0;
+    const double shooterBallSpeedTransferPercent = 0.46;
     const double targetShooterSpeedBase = 500; // rotations per minute - 6 ft range
 
     // Selected
 
     const double baseRange = 136.46; // inches - tower to hub
-    const double minimumRange = 96.0 ; // inches - enough to clear front lip of hub at 60 deg shooter
+    const double minimumRange = 84.0 ; // inches - enough to clear front lip of hub at 60 deg shooter
     const int LEDPort = 1;
     const int kLength = 60; // number of LEDs in the LED strip
 
