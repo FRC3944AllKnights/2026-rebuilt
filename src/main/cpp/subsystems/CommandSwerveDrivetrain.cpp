@@ -49,6 +49,7 @@ void CommandSwerveDrivetrain::DriveDefaultCommand(units::velocity::meters_per_se
     // Else: drive normally
     if (inputLeftY == 0_mps && inputLeftX == 0_mps && inputRightX == 0_rad_per_s) {
         auto matchTime = frc::DriverStation::GetMatchTime();
+        if (frc::DriverStation::IsTeleop() &&
             frc::DriverStation::IsFMSAttached() &&
             matchTime > 0_s && matchTime < kEndOfMatchAlignTime) {
             SetControl(m_straightenWheels.WithModuleDirection(frc::Rotation2d{0_deg}));
