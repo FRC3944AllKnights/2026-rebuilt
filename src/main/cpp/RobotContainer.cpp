@@ -93,8 +93,10 @@ void RobotContainer::ConfigureBindings()
     // Snap-to-45: Right stick button locks heading to nearest corner angle while allowing translation
     joystick.RightStick().OnTrue(
         frc2::cmd::RunOnce([this] {
-            double heading = drivetrain.GetState().Pose.Rotation().Degrees().value();
-            m_snapHeading = units::degree_t{std::round((heading - 45.0) / 90.0) * 90.0 + 45.0};
+            double rawYaw = drivetrain.GetPigeon2().GetYaw().GetValue().value();
+            double poseHeading = drivetrain.GetState().Pose.Rotation().Degrees().value();
+            double fieldSnap = std::round((rawYaw - 45.0) / 90.0) * 90.0 + 45.0;
+            m_snapHeading = units::degree_t{fieldSnap - rawYaw + poseHeading};
         })
     );
     
