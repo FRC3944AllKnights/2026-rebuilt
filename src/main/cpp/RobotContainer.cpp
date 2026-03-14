@@ -66,6 +66,7 @@ void RobotContainer::ConfigureBindings()
     // Intake controls
 
     // Auto-prime: retract to unlatch, then return to start position
+    frc2::RobotModeTriggers::Autonomous().OnTrue(intake.PrimeIntakeCommand());
     frc2::RobotModeTriggers::Teleop().OnTrue(intake.PrimeIntakeCommand());
 
     // Intake jog tuning (Test mode only)
@@ -96,8 +97,8 @@ void RobotContainer::ConfigureBindings()
         intake.PublishTelemetry();
     }, {&intake}));
 
-    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }));
-    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }));
+    joystick.A().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(1.0); }, {&intake}));
+    joystick.B().WhileTrue(frc2::cmd::Run([this] { intake.RunIntake(-1.0); }, {&intake}));
     joystick.X().OnTrue(frc2::cmd::RunOnce([this] { intake.SetIntakePosition(false); }, {&intake}));
     joystick.Y().OnTrue(frc2::cmd::RunOnce([this] { intake.SetIntakePosition(true); }, {&intake}));
 

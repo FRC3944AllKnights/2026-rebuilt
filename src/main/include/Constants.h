@@ -102,7 +102,7 @@ namespace IntakeConstants {
     constexpr auto intakeRollerSupplyCurrentLimit = 40.0_A;  // Amps — roller needs less current
 
     // --- Position Tolerance ---
-    constexpr auto intakePositionTolerance = 0.05_tr;
+    constexpr auto intakePositionTolerance = 0.5_tr;
 
     // --- Jog Tuning (Test Mode) ---
     constexpr auto intakeDeployJogStep = 5.0_tr;
