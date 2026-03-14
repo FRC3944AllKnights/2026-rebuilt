@@ -310,6 +310,8 @@ private:
     // Custom private members
 
     swerve::requests::SwerveDriveBrake brake{};
+    swerve::requests::PointWheelsAt m_straightenWheels{};
+    static constexpr units::second_t kEndOfMatchAlignTime{1.0};
     bool m_autoXBrake = false;
 };
 

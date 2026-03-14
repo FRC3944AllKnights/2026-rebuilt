@@ -45,10 +45,16 @@ void CommandSwerveDrivetrain::DriveDefaultCommand(units::velocity::meters_per_se
         units::velocity::meters_per_second_t inputLeftX,
         units::angular_velocity::radians_per_second_t inputRightX,
         swerve::requests::FieldCentric& drive) {
-    // If given zero-velocity command, set X-brake formation
+    // If given zero-velocity command, set X-brake formation (or straighten wheels at end of match)
     // Else: drive normally
     if (inputLeftY == 0_mps && inputLeftX == 0_mps && inputRightX == 0_rad_per_s) {
-        SetControl(brake);
+        auto matchTime = frc::DriverStation::GetMatchTime();
+            frc::DriverStation::IsFMSAttached() &&
+            matchTime > 0_s && matchTime < kEndOfMatchAlignTime) {
+            SetControl(m_straightenWheels.WithModuleDirection(frc::Rotation2d{0_deg}));
+        } else {
+            SetControl(brake);
+        }
     }
     else {
         SetControl(drive.WithVelocityX(inputLeftY) // Drive forward with negative Y (forward)
